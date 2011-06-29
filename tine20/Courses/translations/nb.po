@@ -5,6 +5,7 @@ msgstr ""
 "PO-Revision-Date: 2009-12-14 15:21+0100\n"
 "Last-Translator: Ronny Gonzales <gonzito@online.no>\n"
 "Language-Team: Tine 2.0 Translators\n"
+"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -13,15 +14,17 @@ msgstr ""
 "X-Poedit-SourceCharset: utf-8\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 
-#: Frontend/Json.php:245 js/Models.js:42 js/CourseEditDialog.js:138
-msgid "Course"
-msgid_plural "Courses"
-msgstr[0] "Kurs"
-msgstr[1] "Kurs"
+#: Controller/Course.php:108
+msgid "teacher"
+msgstr "lærer"
 
-#: Setup/setup.xml:4 js/Courses.js:33
-msgid "Courses"
-msgstr "Kurs"
+#: Controller/Course.php:116
+msgid "Teacher"
+msgstr "Lærer"
+
+#: Controller/Course.php:117
+msgid "Teacher Account"
+msgstr "Lærer Konto"
 
 #: js/CourseGridPanel.js:51
 msgid "Quick search"
@@ -67,25 +70,15 @@ msgstr "Feilet"
 msgid "Some error occured while trying to update the courses."
 msgstr "En feil oppstod ved forsøk på å oppdatere kursene."
 
-#: js/Models.js:46
-msgid "record list"
-msgid_plural "record lists"
-msgstr[0] "opptaks liste"
-msgstr[1] "opptaks lister"
-
-#: js/Models.js:75
-msgid "Course Type"
-msgid_plural "Course Types"
-msgstr[0] "Kurs Type"
-msgstr[1] "Kurs Typer"
-
-#: js/Courses.js:38
-msgid "All Courses"
-msgstr "Alle Kursene"
-
 #: js/CourseEditDialog.js:32
 msgid "Import course members"
 msgstr "Importer kurs medlemmer"
+
+#: js/CourseEditDialog.js:138 js/Models.js:42 Frontend/Json.php:245
+msgid "Course"
+msgid_plural "Courses"
+msgstr[0] "Kurs"
+msgstr[1] "Kurs"
 
 #: js/CourseEditDialog.js:154
 msgid "Course Name"
@@ -123,14 +116,22 @@ msgstr "Sett nytt passord"
 msgid "Please enter the new password:"
 msgstr "Vennligst skriv inn det nye passordet:"
 
-#: Controller/Course.php:108
-msgid "teacher"
-msgstr "lærer"
+#: js/Courses.js:33 Setup/setup.xml:4
+msgid "Courses"
+msgstr "Kurs"
 
-#: Controller/Course.php:116
-msgid "Teacher"
-msgstr "Lærer"
+#: js/Courses.js:38
+msgid "All Courses"
+msgstr "Alle Kursene"
 
-#: Controller/Course.php:117
-msgid "Teacher Account"
-msgstr "Lærer Konto"
+#: js/Models.js:46
+msgid "record list"
+msgid_plural "record lists"
+msgstr[0] "opptaks liste"
+msgstr[1] "opptaks lister"
+
+#: js/Models.js:75
+msgid "Course Type"
+msgid_plural "Course Types"
+msgstr[0] "Kurs Type"
+msgstr[1] "Kurs Typer"

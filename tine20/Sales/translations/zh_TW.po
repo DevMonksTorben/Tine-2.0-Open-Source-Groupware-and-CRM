@@ -5,6 +5,7 @@ msgstr ""
 "PO-Revision-Date: 2009-03-31 22:36+0800\n"
 "Last-Translator: Frank <frank.cchuang@gmail.com>\n"
 "Language-Team: Tine 2.0 Translators\n"
+"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -13,10 +14,6 @@ msgstr ""
 "X-Poedit-SourceCharset: utf-8\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: Setup/setup.xml:243
-msgid "Shared Contracts"
-msgstr "已分享的合約"
-
 #: Acl/Rights.php:104
 msgid "manage products"
 msgstr ""
@@ -24,6 +21,35 @@ msgstr ""
 #: Acl/Rights.php:105
 msgid "add, edit and delete products"
 msgstr ""
+
+#: js/ContractEditDialog.js:97 js/ContractGridPanel.js:88
+msgid "Title"
+msgstr "標題"
+
+#: js/ContractEditDialog.js:102 js/ProductEditDialog.js:125
+#: js/ProductGridPanel.js:128
+msgid "Description"
+msgstr "說明"
+
+#: js/ContractEditDialog.js:103 js/ProductEditDialog.js:126
+msgid "Enter description..."
+msgstr "輸入說明"
+
+#: js/ContractGridPanel.js:62 js/Models.js:79
+msgid "Quick search"
+msgstr ""
+
+#: js/ContractGridPanel.js:63
+msgid "Summary"
+msgstr "總計"
+
+#: js/ContractGridPanel.js:82
+msgid "Contract number"
+msgstr "合約編號"
+
+#: js/ContractGridPanel.js:94
+msgid "Status"
+msgstr "狀態"
 
 #: js/ProductEditDialog.js:104 js/ProductGridPanel.js:125
 msgid "Name"
@@ -41,14 +67,9 @@ msgstr ""
 msgid "Category"
 msgstr ""
 
-#: js/ProductEditDialog.js:125 js/ContractEditDialog.js:102
-#: js/ProductGridPanel.js:128
-msgid "Description"
-msgstr "說明"
-
-#: js/ProductEditDialog.js:126 js/ContractEditDialog.js:103
-msgid "Enter description..."
-msgstr "輸入說明"
+#: js/ProductGridPanel.js:124
+msgid "Tags"
+msgstr ""
 
 #: js/Models.js:41
 msgid "Product"
@@ -60,10 +81,6 @@ msgstr[0] ""
 msgid "record list"
 msgid_plural "record lists"
 msgstr[0] "合約清單"
-
-#: js/Models.js:79 js/ContractGridPanel.js:62
-msgid "Quick search"
-msgstr ""
 
 #: js/Models.js:80
 msgid "Product name"
@@ -78,22 +95,6 @@ msgstr[0] "合約"
 msgid "contracts list"
 msgid_plural "contracts lists"
 msgstr[0] "合約清單"
-
-#: js/ContractEditDialog.js:97 js/ContractGridPanel.js:88
-msgid "Title"
-msgstr "標題"
-
-#: js/ContractGridPanel.js:63
-msgid "Summary"
-msgstr "總計"
-
-#: js/ContractGridPanel.js:82
-msgid "Contract number"
-msgstr "合約編號"
-
-#: js/ContractGridPanel.js:94
-msgid "Status"
-msgstr "狀態"
 
 #: js/Sales.js:55
 msgid "Products"
@@ -112,6 +113,6 @@ msgstr "合約"
 msgid "All Contracts"
 msgstr "合約"
 
-#: js/ProductGridPanel.js:124
-msgid "Tags"
-msgstr ""
+#: Setup/setup.xml:243
+msgid "Shared Contracts"
+msgstr "已分享的合約"

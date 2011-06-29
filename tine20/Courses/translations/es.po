@@ -5,6 +5,7 @@ msgstr ""
 "PO-Revision-Date: 2010-02-10 16:32-0400\n"
 "Last-Translator: \n"
 "Language-Team: Tine 2.0 Translators\n"
+"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -13,15 +14,17 @@ msgstr ""
 "X-Poedit-SourceCharset: utf-8\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 
-#: Frontend/Json.php:245 js/Models.js:42 js/CourseEditDialog.js:138
-msgid "Course"
-msgid_plural "Courses"
-msgstr[0] "Curso"
-msgstr[1] "Cursos"
+#: Controller/Course.php:108
+msgid "teacher"
+msgstr "profesor"
 
-#: Setup/setup.xml:4 js/Courses.js:33
-msgid "Courses"
-msgstr "Cursos"
+#: Controller/Course.php:116
+msgid "Teacher"
+msgstr "Profesor"
+
+#: Controller/Course.php:117
+msgid "Teacher Account"
+msgstr "Cuenta de Profesor"
 
 #: js/CourseGridPanel.js:51
 msgid "Quick search"
@@ -67,25 +70,15 @@ msgstr "Falló"
 msgid "Some error occured while trying to update the courses."
 msgstr "Algún error ocurrió mientras intentaba actualizar los cursos."
 
-#: js/Models.js:46
-msgid "record list"
-msgid_plural "record lists"
-msgstr[0] "listado de registro"
-msgstr[1] "listado de registros"
-
-#: js/Models.js:75
-msgid "Course Type"
-msgid_plural "Course Types"
-msgstr[0] "Tipo de Curso"
-msgstr[1] "Tipo de Cursos"
-
-#: js/Courses.js:38
-msgid "All Courses"
-msgstr "Todos los Cursos"
-
 #: js/CourseEditDialog.js:32
 msgid "Import course members"
 msgstr "Importar integrantes del curso"
+
+#: js/CourseEditDialog.js:138 js/Models.js:42 Frontend/Json.php:245
+msgid "Course"
+msgid_plural "Courses"
+msgstr[0] "Curso"
+msgstr[1] "Cursos"
 
 #: js/CourseEditDialog.js:154
 msgid "Course Name"
@@ -123,14 +116,22 @@ msgstr "Establecer nueva contraseña"
 msgid "Please enter the new password:"
 msgstr "Por favor escriba su nueva contraseña:"
 
-#: Controller/Course.php:108
-msgid "teacher"
-msgstr "profesor"
+#: js/Courses.js:33 Setup/setup.xml:4
+msgid "Courses"
+msgstr "Cursos"
 
-#: Controller/Course.php:116
-msgid "Teacher"
-msgstr "Profesor"
+#: js/Courses.js:38
+msgid "All Courses"
+msgstr "Todos los Cursos"
 
-#: Controller/Course.php:117
-msgid "Teacher Account"
-msgstr "Cuenta de Profesor"
+#: js/Models.js:46
+msgid "record list"
+msgid_plural "record lists"
+msgstr[0] "listado de registro"
+msgstr[1] "listado de registros"
+
+#: js/Models.js:75
+msgid "Course Type"
+msgid_plural "Course Types"
+msgstr[0] "Tipo de Curso"
+msgstr[1] "Tipo de Cursos"

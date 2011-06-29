@@ -5,6 +5,7 @@ msgstr ""
 "PO-Revision-Date: \n"
 "Last-Translator: Michal Sladek <msladek@brotel.cz>\n"
 "Language-Team: \n"
+"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -104,17 +105,468 @@ msgstr "zobrazit počítače"
 msgid "view computers list and details"
 msgstr "zobrazit podrobný seznam počítačů"
 
-#: js/SambaMachineEditDialog.js:43 js/SambaMachineGrid.js:68
+#: js/SambaMachineGrid.js:68 js/SambaMachineEditDialog.js:43
 msgid "Computer Name"
 msgstr "Název počítače"
 
-#: js/Admin.js:24 js/user/GridPanel.js:100 js/user/Users.js:73
+#: js/SambaMachineGrid.js:69 js/SambaMachineGrid.js:99 js/Groups.js:239
+#: js/RoleEditDialog.js:292 js/user/GridPanel.js:101 js/GroupEditDialog.js:136
+#: js/TagEditDialog.js:226 js/Roles.js:240 js/Tags.js:227
+msgid "Description"
+msgstr "Popis"
+
+#: js/SambaMachineGrid.js:86 js/Groups.js:237 js/user/GridPanel.js:159
+#: js/Roles.js:238
+msgid "ID"
+msgstr "ID"
+
+#: js/SambaMachineGrid.js:93 js/Groups.js:238 js/user/EditDialog.js:280
+#: js/user/EditDialog.js:316 js/Applications.js:286 js/Roles.js:239
+#: js/Tags.js:226 js/AccessLog.js:133
+msgid "Name"
+msgstr "Jméno"
+
+#: js/Groups.js:55 js/Roles.js:48 js/Tags.js:65
+msgid "Confirm"
+msgstr "Potvrdit"
+
+#: js/Groups.js:55
+msgid "Do you really want to delete the selected groups?"
+msgstr "Opravdu chcete smazat vybrané skupiny?"
+
+#: js/Groups.js:72
+msgid "Deleting group(s)..."
+msgstr "Mažu skupinu(y)..."
+
+#: js/Groups.js:77 js/RoleEditDialog.js:107 js/RoleEditDialog.js:135
+#: js/GroupEditDialog.js:73 js/TagEditDialog.js:83 js/Roles.js:70
+msgid "Failed"
+msgstr "Nepodařilo se"
+
+#: js/Groups.js:77
+msgid "Some error occurred while trying to delete the group."
+msgstr "Během mazání skupiny došlo k chybě."
+
+#: js/Groups.js:107
+msgid "add group"
+msgstr "přidat skupinu"
+
+#: js/Groups.js:115
+msgid "edit group"
+msgstr "editovat skupinu"
+
+#: js/Groups.js:123
+msgid "delete group"
+msgstr "smazat skupinu"
+
+#: js/Groups.js:179 js/Applications.js:191 js/Roles.js:177 js/Tags.js:170
+msgid "Search:"
+msgstr "Hledat:"
+
+#: js/Groups.js:226
+msgid "Displaying groups {0} - {1} of {2}"
+msgstr "Zobrazuji skupiny {0} - {1} z {2}"
+
+#: js/Groups.js:227 js/Groups.js:282
+msgid "No groups to display"
+msgstr "Žádné skupiny ke zobrazení"
+
+#: js/SambaMachineModel.js:40
+msgid "Computer"
+msgid_plural "Computers"
+msgstr[0] "Počítač"
+msgstr[1] "Počítače"
+msgstr[2] "Počítačů"
+
+#: js/RoleEditDialog.js:70 js/GroupEditDialog.js:38 js/TagEditDialog.js:38
+msgid "Please wait"
+msgstr "Čekejte prosím"
+
+#: js/RoleEditDialog.js:70 js/GroupEditDialog.js:38
+msgid "Updating Memberships"
+msgstr "Aktualizuji členství"
+
+#: js/RoleEditDialog.js:107
+msgid "Could not save role."
+msgstr "Nepodařilo se uložit roli."
+
+#: js/RoleEditDialog.js:114 js/GroupEditDialog.js:78 js/TagEditDialog.js:88
+msgid "Errors"
+msgstr "Chyby"
+
+#: js/RoleEditDialog.js:114 js/GroupEditDialog.js:78 js/TagEditDialog.js:88
+msgid "Please fix the errors noted."
+msgstr "Opravte prosím vyznačené chyby."
+
+#: js/RoleEditDialog.js:127
+msgid "Deleting role..."
+msgstr "Mažu roli..."
+
+#: js/RoleEditDialog.js:135 js/Roles.js:70
+msgid "Some error occurred while trying to delete the role."
+msgstr "Během mazání role došlo k chybě."
+
+#: js/RoleEditDialog.js:159
+msgid "Rights"
+msgstr "Práva"
+
+#: js/RoleEditDialog.js:261
+msgid "Members"
+msgstr "Členové"
+
+#: js/RoleEditDialog.js:284
+msgid "Role Name"
+msgstr "Název role"
+
+#: js/RoleEditDialog.js:359 js/GroupEditDialog.js:216 js/TagEditDialog.js:290
+msgid "Transferring {0}..."
+msgstr ""
+
+#: js/RoleEditDialog.js:359
+msgid "Role"
+msgstr "Role"
+
+#: js/RoleEditDialog.js:369
+msgid "Add New Role"
+msgstr "Přidat novou roli"
+
+#: js/RoleEditDialog.js:371
+msgid "Edit Role \"{0}\""
+msgstr "Editovat roli \"{0}\""
+
+#: js/user/GridPanel.js:58
+msgid "enable account"
+msgstr "povolit účet"
+
+#: js/user/GridPanel.js:68
+msgid "disable account"
+msgstr "zakázat účet"
+
+#: js/user/GridPanel.js:78
+msgid "reset password"
+msgstr "resetovat heslo"
+
+#: js/user/GridPanel.js:100 js/user/Users.js:73 js/Admin.js:24
 #: js/AccessLog.js:109
 msgid "User"
 msgid_plural "Users"
 msgstr[0] "Uživatel"
 msgstr[1] "Uživatelé"
 msgstr[2] "Uživatelů"
+
+#: js/user/GridPanel.js:160 js/user/EditDialog.js:825 js/Applications.js:287
+msgid "Status"
+msgstr "Stav"
+
+#: js/user/GridPanel.js:161
+msgid "Displayname"
+msgstr "Zobrazované jméno"
+
+#: js/user/GridPanel.js:162
+msgid "Loginname"
+msgstr "Přihlašovací jméno"
+
+#: js/user/GridPanel.js:163
+msgid "Last name"
+msgstr "Příjmení"
+
+#: js/user/GridPanel.js:164
+msgid "First name"
+msgstr "Křestní jméno"
+
+#: js/user/GridPanel.js:165
+msgid "Email"
+msgstr "Email"
+
+#: js/user/GridPanel.js:166 js/user/EditDialog.js:802
+msgid "OpenID"
+msgstr "OpenID"
+
+#: js/user/GridPanel.js:167 js/user/EditDialog.js:886
+msgid "Last login at"
+msgstr "Poslední přihlášení"
+
+#: js/user/GridPanel.js:168 js/user/EditDialog.js:890
+msgid "Last login from"
+msgstr "Poslední přihlášení z"
+
+#: js/user/GridPanel.js:169
+msgid "Password changed"
+msgstr "Heslo změněno"
+
+#: js/user/GridPanel.js:170 js/user/EditDialog.js:834
+msgid "Expires"
+msgstr "Vyprší"
+
+#: js/user/GridPanel.js:227
+msgid "Set new password"
+msgstr "Nastavit nové heslo"
+
+#: js/user/GridPanel.js:227
+msgid "Please enter the new password:"
+msgstr "Zadejte prosím nové heslo:"
+
+#: js/user/Users.js:119
+msgid "Samba User"
+msgid_plural "Samba Users"
+msgstr[0] "Uživatel Samby"
+msgstr[1] "Uživatelé Samby"
+msgstr[2] "Uživatelů Samby"
+
+#: js/user/Users.js:145
+msgid "Email User"
+msgid_plural "Email Users"
+msgstr[0] "Uživatel emailu"
+msgstr[1] "Uživatelé emailu"
+msgstr[2] "Uživatelů emailu"
+
+#: js/user/EditDialog.js:182
+msgid "Domain is not allowed. Check your SMTP domain configuration."
+msgstr ""
+
+#: js/user/EditDialog.js:229 js/user/EditDialog.js:232
+#: js/user/EditDialog.js:682
+msgid "Passwords do not match!"
+msgstr "Hesla se neshodují!"
+
+#: js/user/EditDialog.js:235
+msgid "Passwords match!"
+msgstr ""
+
+#: js/user/EditDialog.js:281 js/user/EditDialog.js:808
+msgid "Primary group"
+msgstr "Primární skupina"
+
+#: js/user/EditDialog.js:358
+msgid "Unix"
+msgstr "Unix"
+
+#: js/user/EditDialog.js:372
+msgid "Home Directory"
+msgstr "Domovský adresář"
+
+#: js/user/EditDialog.js:376
+msgid "Login Shell"
+msgstr "Přihlašovací shell"
+
+#: js/user/EditDialog.js:382
+msgid "Windows"
+msgstr "Windows"
+
+#: js/user/EditDialog.js:396
+msgid "Home Drive"
+msgstr "Domovský disk"
+
+#: js/user/EditDialog.js:401
+msgid "Logon Time"
+msgstr "Čas přihlášení"
+
+#: js/user/EditDialog.js:403 js/user/EditDialog.js:888
+#: js/user/EditDialog.js:892
+msgid "never logged in"
+msgstr "nikdy nepřihlášen"
+
+#: js/user/EditDialog.js:406
+msgid "Home Path"
+msgstr "Domovská cesta"
+
+#: js/user/EditDialog.js:411
+msgid "Logoff Time"
+msgstr "Čas odhlášení"
+
+#: js/user/EditDialog.js:413
+msgid "never logged off"
+msgstr "nikdy neodhlášen"
+
+#: js/user/EditDialog.js:416
+msgid "Profile Path"
+msgstr "Cesta k profilu"
+
+#: js/user/EditDialog.js:421
+msgid "Password Last Set"
+msgstr "Heslo naposledy nastaveno"
+
+#: js/user/EditDialog.js:423 js/user/EditDialog.js:836
+#: js/user/EditDialog.js:896
+msgid "never"
+msgstr "nikdy"
+
+#: js/user/EditDialog.js:426
+msgid "Logon Script"
+msgstr "Přihlašovací skript"
+
+#: js/user/EditDialog.js:431
+msgid "Password Can Change"
+msgstr "Může změnit heslo"
+
+#: js/user/EditDialog.js:433 js/user/EditDialog.js:438
+#: js/user/EditDialog.js:443
+msgid "not set"
+msgstr "není nastaveno"
+
+#: js/user/EditDialog.js:436
+msgid "Password Must Change"
+msgstr "Musí změnit heslo"
+
+#: js/user/EditDialog.js:441
+msgid "Kick Off Time"
+msgstr "Čas automatického odhlášení"
+
+#: js/user/EditDialog.js:461
+msgid "IMAP Quota (MB)"
+msgstr ""
+
+#: js/user/EditDialog.js:480 js/user/EditDialog.js:518
+msgid "Quota"
+msgstr "Kvóta"
+
+#: js/user/EditDialog.js:481 js/user/EditDialog.js:519
+msgid "no quota set"
+msgstr ""
+
+#: js/user/EditDialog.js:491
+msgid "Current Mailbox size"
+msgstr ""
+
+#: js/user/EditDialog.js:499
+msgid "Sieve Quota (MB)"
+msgstr "Sieve kvóta (MB)"
+
+#: js/user/EditDialog.js:529
+msgid "Current Sieve size"
+msgstr ""
+
+#: js/user/EditDialog.js:538 js/user/EditDialog.js:871
+msgid "Information"
+msgstr "Informace"
+
+#: js/user/EditDialog.js:552
+msgid "Last Login"
+msgstr "Poslední přihlášení"
+
+#: js/user/EditDialog.js:589
+msgid "Email Alias"
+msgstr "Alias"
+
+#: js/user/EditDialog.js:595
+msgid "Add an alias address..."
+msgstr "Přidat alias..."
+
+#: js/user/EditDialog.js:608
+msgid "Email Forward"
+msgstr "Přeposílání pošty"
+
+#: js/user/EditDialog.js:614
+msgid "Add a forward address..."
+msgstr "Přidat adresu pro přeposílání..."
+
+#: js/user/EditDialog.js:626
+msgid "Forward Only"
+msgstr "Jen přesměrovat"
+
+#: js/user/EditDialog.js:649
+msgid "Password confirmation"
+msgstr "Potvrzení hesla"
+
+#: js/user/EditDialog.js:666
+msgid "Repeat password"
+msgstr "Zopakujte heslo"
+
+#: js/user/EditDialog.js:685
+msgid "Cancel"
+msgstr "Storno"
+
+#: js/user/EditDialog.js:693
+msgid "Ok"
+msgstr "OK"
+
+#: js/user/EditDialog.js:730
+msgid "Account"
+msgstr "Účet"
+
+#: js/user/EditDialog.js:745
+msgid "First Name"
+msgstr "Křestní jméno"
+
+#: js/user/EditDialog.js:755
+msgid "Last Name"
+msgstr "Příjmení"
+
+#: js/user/EditDialog.js:760 js/user/EditDialog.js:803 js/AccessLog.js:132
+msgid "Login Name"
+msgstr "Přihlašovací jméno"
+
+#: js/user/EditDialog.js:765
+msgid "Password"
+msgstr "Heslo"
+
+#: js/user/EditDialog.js:769
+msgid "no password set"
+msgstr "heslo nebylo nastaveno"
+
+#: js/user/EditDialog.js:796
+msgid "Emailaddress"
+msgstr "Emailová adresa"
+
+#: js/user/EditDialog.js:831 js/Applications.js:237
+msgid "enabled"
+msgstr "povoleno"
+
+#: js/user/EditDialog.js:831 js/Applications.js:234
+msgid "disabled"
+msgstr "zakázáno"
+
+#: js/user/EditDialog.js:831
+msgid "expired"
+msgstr "vypršel"
+
+#: js/user/EditDialog.js:831
+msgid "blocked"
+msgstr ""
+
+#: js/user/EditDialog.js:839 js/GroupEditDialog.js:144
+msgid "Visibility"
+msgstr "Viditelnost"
+
+#: js/user/EditDialog.js:845 js/GroupEditDialog.js:150
+msgid "Display in addressbook"
+msgstr "Zobrazit v adresáři"
+
+#: js/user/EditDialog.js:845 js/GroupEditDialog.js:150
+msgid "Hide from addressbook"
+msgstr "Nezobrazovat v adresáři"
+
+#: js/user/EditDialog.js:859 js/GroupEditDialog.js:161
+msgid "Saved in Addressbook"
+msgstr ""
+
+#: js/user/EditDialog.js:888 js/user/EditDialog.js:892
+msgid "don't know"
+msgstr "nevím"
+
+#: js/user/EditDialog.js:894
+msgid "Password set"
+msgstr "Heslo nastaveno"
+
+#: js/user/EditDialog.js:901
+msgid "User groups"
+msgstr ""
+
+#: js/user/EditDialog.js:907
+msgid "User roles"
+msgstr ""
+
+#: js/user/EditDialog.js:913
+msgid "Fileserver"
+msgstr "Souborový server"
+
+#: js/user/EditDialog.js:919
+msgid "IMAP"
+msgstr "IMAP"
+
+#: js/user/EditDialog.js:928
+msgid "SMTP"
+msgstr "SMTP"
 
 #: js/Admin.js:37 js/Models.js:88
 msgid "Groups"
@@ -147,478 +599,6 @@ msgstr "Sdílené štítky"
 #: js/Admin.js:138
 msgid "Admin"
 msgstr "Administrátor"
-
-#: js/GroupEditDialog.js:38 js/RoleEditDialog.js:70 js/TagEditDialog.js:38
-msgid "Please wait"
-msgstr "Čekejte prosím"
-
-#: js/GroupEditDialog.js:38 js/RoleEditDialog.js:70
-msgid "Updating Memberships"
-msgstr "Aktualizuji členství"
-
-#: js/GroupEditDialog.js:73 js/RoleEditDialog.js:107 js/RoleEditDialog.js:135
-#: js/Groups.js:77 js/TagEditDialog.js:83 js/Roles.js:70
-msgid "Failed"
-msgstr "Nepodařilo se"
-
-#: js/GroupEditDialog.js:73
-msgid "Could not save group."
-msgstr "Nepodařilo se uložit skupinu."
-
-#: js/GroupEditDialog.js:78 js/RoleEditDialog.js:114 js/TagEditDialog.js:88
-msgid "Errors"
-msgstr "Chyby"
-
-#: js/GroupEditDialog.js:78 js/RoleEditDialog.js:114 js/TagEditDialog.js:88
-msgid "Please fix the errors noted."
-msgstr "Opravte prosím vyznačené chyby."
-
-#: js/GroupEditDialog.js:109
-msgid "Group Members"
-msgstr "Členové skupiny"
-
-#: js/GroupEditDialog.js:128
-msgid "Group Name"
-msgstr "Název skupiny"
-
-#: js/GroupEditDialog.js:136 js/SambaMachineGrid.js:69
-#: js/SambaMachineGrid.js:99 js/RoleEditDialog.js:292 js/user/GridPanel.js:101
-#: js/Groups.js:239 js/TagEditDialog.js:226 js/Tags.js:227 js/Roles.js:240
-msgid "Description"
-msgstr "Popis"
-
-#: js/GroupEditDialog.js:144 js/user/EditDialog.js:784
-msgid "Visibility"
-msgstr "Viditelnost"
-
-#: js/GroupEditDialog.js:150 js/user/EditDialog.js:790
-msgid "Display in addressbook"
-msgstr "Zobrazit v adresáři"
-
-#: js/GroupEditDialog.js:150 js/user/EditDialog.js:790
-msgid "Hide from addressbook"
-msgstr "Nezobrazovat v adresáři"
-
-#: js/GroupEditDialog.js:161 js/user/EditDialog.js:804
-msgid "Saved in Addressbook"
-msgstr ""
-
-#: js/GroupEditDialog.js:216 js/RoleEditDialog.js:359 js/TagEditDialog.js:290
-msgid "Transferring {0}..."
-msgstr ""
-
-#: js/GroupEditDialog.js:216 js/Models.js:88
-#, fuzzy
-msgid "Group"
-msgid_plural "Groups"
-msgstr[0] "Skupina"
-msgstr[1] "Skupina"
-msgstr[2] "Skupina"
-
-#: js/GroupEditDialog.js:221 js/GroupEditDialog.js:232
-msgid "Add new group"
-msgstr "Přídat novou skupinu"
-
-#: js/GroupEditDialog.js:234
-msgid "Edit Group \"{0}\""
-msgstr "Editovat skupinu \"{0}\""
-
-#: js/SambaMachineGrid.js:86 js/user/GridPanel.js:159 js/Groups.js:237
-#: js/Roles.js:238
-msgid "ID"
-msgstr "ID"
-
-#: js/SambaMachineGrid.js:93 js/user/EditDialog.js:223
-#: js/user/EditDialog.js:259 js/Groups.js:238 js/Applications.js:286
-#: js/AccessLog.js:133 js/Tags.js:226 js/Roles.js:239
-msgid "Name"
-msgstr "Jméno"
-
-#: js/AdminPanel.js:48
-msgid "Default Addressbook for new contacts and groups"
-msgstr ""
-
-#: js/RoleEditDialog.js:107
-msgid "Could not save role."
-msgstr "Nepodařilo se uložit roli."
-
-#: js/RoleEditDialog.js:127
-msgid "Deleting role..."
-msgstr "Mažu roli..."
-
-#: js/RoleEditDialog.js:135 js/Roles.js:70
-msgid "Some error occurred while trying to delete the role."
-msgstr "Během mazání role došlo k chybě."
-
-#: js/RoleEditDialog.js:159
-msgid "Rights"
-msgstr "Práva"
-
-#: js/RoleEditDialog.js:261
-msgid "Members"
-msgstr "Členové"
-
-#: js/RoleEditDialog.js:284
-msgid "Role Name"
-msgstr "Název role"
-
-#: js/RoleEditDialog.js:359
-msgid "Role"
-msgstr "Role"
-
-#: js/RoleEditDialog.js:369
-msgid "Add New Role"
-msgstr "Přidat novou roli"
-
-#: js/RoleEditDialog.js:371
-msgid "Edit Role \"{0}\""
-msgstr "Editovat roli \"{0}\""
-
-#: js/user/GridPanel.js:58
-msgid "enable account"
-msgstr "povolit účet"
-
-#: js/user/GridPanel.js:68
-msgid "disable account"
-msgstr "zakázat účet"
-
-#: js/user/GridPanel.js:78
-msgid "reset password"
-msgstr "resetovat heslo"
-
-#: js/user/GridPanel.js:160 js/user/EditDialog.js:770 js/Applications.js:287
-msgid "Status"
-msgstr "Stav"
-
-#: js/user/GridPanel.js:161
-msgid "Displayname"
-msgstr "Zobrazované jméno"
-
-#: js/user/GridPanel.js:162
-msgid "Loginname"
-msgstr "Přihlašovací jméno"
-
-#: js/user/GridPanel.js:163
-msgid "Last name"
-msgstr "Příjmení"
-
-#: js/user/GridPanel.js:164
-msgid "First name"
-msgstr "Křestní jméno"
-
-#: js/user/GridPanel.js:165
-msgid "Email"
-msgstr "Email"
-
-#: js/user/GridPanel.js:166 js/user/EditDialog.js:747
-msgid "OpenID"
-msgstr "OpenID"
-
-#: js/user/GridPanel.js:167 js/user/EditDialog.js:831
-msgid "Last login at"
-msgstr "Poslední přihlášení"
-
-#: js/user/GridPanel.js:168 js/user/EditDialog.js:835
-msgid "Last login from"
-msgstr "Poslední přihlášení z"
-
-#: js/user/GridPanel.js:169
-msgid "Password changed"
-msgstr "Heslo změněno"
-
-#: js/user/GridPanel.js:170 js/user/EditDialog.js:779
-msgid "Expires"
-msgstr "Vyprší"
-
-#: js/user/GridPanel.js:227
-msgid "Set new password"
-msgstr "Nastavit nové heslo"
-
-#: js/user/GridPanel.js:227
-msgid "Please enter the new password:"
-msgstr "Zadejte prosím nové heslo:"
-
-#: js/user/EditDialog.js:172 js/user/EditDialog.js:175
-#: js/user/EditDialog.js:625
-msgid "Passwords do not match!"
-msgstr "Hesla se neshodují!"
-
-#: js/user/EditDialog.js:178
-msgid "Passwords match!"
-msgstr ""
-
-#: js/user/EditDialog.js:224 js/user/EditDialog.js:753
-msgid "Primary group"
-msgstr "Primární skupina"
-
-#: js/user/EditDialog.js:301
-msgid "Unix"
-msgstr "Unix"
-
-#: js/user/EditDialog.js:315
-msgid "Home Directory"
-msgstr "Domovský adresář"
-
-#: js/user/EditDialog.js:319
-msgid "Login Shell"
-msgstr "Přihlašovací shell"
-
-#: js/user/EditDialog.js:325
-msgid "Windows"
-msgstr "Windows"
-
-#: js/user/EditDialog.js:339
-msgid "Home Drive"
-msgstr "Domovský disk"
-
-#: js/user/EditDialog.js:344
-msgid "Logon Time"
-msgstr "Čas přihlášení"
-
-#: js/user/EditDialog.js:346 js/user/EditDialog.js:833
-#: js/user/EditDialog.js:837
-msgid "never logged in"
-msgstr "nikdy nepřihlášen"
-
-#: js/user/EditDialog.js:349
-msgid "Home Path"
-msgstr "Domovská cesta"
-
-#: js/user/EditDialog.js:354
-msgid "Logoff Time"
-msgstr "Čas odhlášení"
-
-#: js/user/EditDialog.js:356
-msgid "never logged off"
-msgstr "nikdy neodhlášen"
-
-#: js/user/EditDialog.js:359
-msgid "Profile Path"
-msgstr "Cesta k profilu"
-
-#: js/user/EditDialog.js:364
-msgid "Password Last Set"
-msgstr "Heslo naposledy nastaveno"
-
-#: js/user/EditDialog.js:366 js/user/EditDialog.js:781
-#: js/user/EditDialog.js:841
-msgid "never"
-msgstr "nikdy"
-
-#: js/user/EditDialog.js:369
-msgid "Logon Script"
-msgstr "Přihlašovací skript"
-
-#: js/user/EditDialog.js:374
-msgid "Password Can Change"
-msgstr "Může změnit heslo"
-
-#: js/user/EditDialog.js:376 js/user/EditDialog.js:381
-#: js/user/EditDialog.js:386
-msgid "not set"
-msgstr "není nastaveno"
-
-#: js/user/EditDialog.js:379
-msgid "Password Must Change"
-msgstr "Musí změnit heslo"
-
-#: js/user/EditDialog.js:384
-msgid "Kick Off Time"
-msgstr "Čas automatického odhlášení"
-
-#: js/user/EditDialog.js:404
-msgid "IMAP Quota (MB)"
-msgstr ""
-
-#: js/user/EditDialog.js:423 js/user/EditDialog.js:461
-msgid "Quota"
-msgstr "Kvóta"
-
-#: js/user/EditDialog.js:424 js/user/EditDialog.js:462
-msgid "no quota set"
-msgstr ""
-
-#: js/user/EditDialog.js:434
-msgid "Current Mailbox size"
-msgstr ""
-
-#: js/user/EditDialog.js:442
-msgid "Sieve Quota (MB)"
-msgstr "Sieve kvóta (MB)"
-
-#: js/user/EditDialog.js:472
-msgid "Current Sieve size"
-msgstr ""
-
-#: js/user/EditDialog.js:481 js/user/EditDialog.js:816
-msgid "Information"
-msgstr "Informace"
-
-#: js/user/EditDialog.js:495
-msgid "Last Login"
-msgstr "Poslední přihlášení"
-
-#: js/user/EditDialog.js:532
-msgid "Email Alias"
-msgstr "Alias"
-
-#: js/user/EditDialog.js:538
-msgid "Add an alias address..."
-msgstr "Přidat alias..."
-
-#: js/user/EditDialog.js:551
-msgid "Email Forward"
-msgstr "Přeposílání pošty"
-
-#: js/user/EditDialog.js:557
-msgid "Add a forward address..."
-msgstr "Přidat adresu pro přeposílání..."
-
-#: js/user/EditDialog.js:569
-msgid "Forward Only"
-msgstr "Jen přesměrovat"
-
-#: js/user/EditDialog.js:592
-msgid "Password confirmation"
-msgstr "Potvrzení hesla"
-
-#: js/user/EditDialog.js:609
-msgid "Repeat password"
-msgstr "Zopakujte heslo"
-
-#: js/user/EditDialog.js:628
-msgid "Cancel"
-msgstr "Storno"
-
-#: js/user/EditDialog.js:636
-msgid "Ok"
-msgstr "OK"
-
-#: js/user/EditDialog.js:673
-msgid "Account"
-msgstr "Účet"
-
-#: js/user/EditDialog.js:688
-msgid "First Name"
-msgstr "Křestní jméno"
-
-#: js/user/EditDialog.js:698
-msgid "Last Name"
-msgstr "Příjmení"
-
-#: js/user/EditDialog.js:703 js/user/EditDialog.js:748 js/AccessLog.js:132
-msgid "Login Name"
-msgstr "Přihlašovací jméno"
-
-#: js/user/EditDialog.js:708
-msgid "Password"
-msgstr "Heslo"
-
-#: js/user/EditDialog.js:712
-msgid "no password set"
-msgstr "heslo nebylo nastaveno"
-
-#: js/user/EditDialog.js:741
-msgid "Emailaddress"
-msgstr "Emailová adresa"
-
-#: js/user/EditDialog.js:776 js/Applications.js:237
-msgid "enabled"
-msgstr "povoleno"
-
-#: js/user/EditDialog.js:776 js/Applications.js:234
-msgid "disabled"
-msgstr "zakázáno"
-
-#: js/user/EditDialog.js:776
-msgid "expired"
-msgstr "vypršel"
-
-#: js/user/EditDialog.js:776
-msgid "blocked"
-msgstr ""
-
-#: js/user/EditDialog.js:833 js/user/EditDialog.js:837
-msgid "don't know"
-msgstr "nevím"
-
-#: js/user/EditDialog.js:839
-msgid "Password set"
-msgstr "Heslo nastaveno"
-
-#: js/user/EditDialog.js:846
-msgid "User groups"
-msgstr ""
-
-#: js/user/EditDialog.js:852
-msgid "User roles"
-msgstr ""
-
-#: js/user/EditDialog.js:858
-msgid "Fileserver"
-msgstr "Souborový server"
-
-#: js/user/EditDialog.js:864
-msgid "IMAP"
-msgstr "IMAP"
-
-#: js/user/EditDialog.js:873
-msgid "SMTP"
-msgstr "SMTP"
-
-#: js/user/Users.js:119
-msgid "Samba User"
-msgid_plural "Samba Users"
-msgstr[0] "Uživatel Samby"
-msgstr[1] "Uživatelé Samby"
-msgstr[2] "Uživatelů Samby"
-
-#: js/user/Users.js:145
-msgid "Email User"
-msgid_plural "Email Users"
-msgstr[0] "Uživatel emailu"
-msgstr[1] "Uživatelé emailu"
-msgstr[2] "Uživatelů emailu"
-
-#: js/Groups.js:55 js/Tags.js:65 js/Roles.js:48
-msgid "Confirm"
-msgstr "Potvrdit"
-
-#: js/Groups.js:55
-msgid "Do you really want to delete the selected groups?"
-msgstr "Opravdu chcete smazat vybrané skupiny?"
-
-#: js/Groups.js:72
-msgid "Deleting group(s)..."
-msgstr "Mažu skupinu(y)..."
-
-#: js/Groups.js:77
-msgid "Some error occurred while trying to delete the group."
-msgstr "Během mazání skupiny došlo k chybě."
-
-#: js/Groups.js:107
-msgid "add group"
-msgstr "přidat skupinu"
-
-#: js/Groups.js:115
-msgid "edit group"
-msgstr "editovat skupinu"
-
-#: js/Groups.js:123
-msgid "delete group"
-msgstr "smazat skupinu"
-
-#: js/Groups.js:179 js/Applications.js:191 js/Tags.js:170 js/Roles.js:177
-msgid "Search:"
-msgstr "Hledat:"
-
-#: js/Groups.js:226
-msgid "Displaying groups {0} - {1} of {2}"
-msgstr "Zobrazuji skupiny {0} - {1} z {2}"
-
-#: js/Groups.js:227 js/Groups.js:282
-msgid "No groups to display"
-msgstr "Žádné skupiny ke zobrazení"
 
 #: js/Applications.js:44
 msgid "{0} Settings"
@@ -655,6 +635,38 @@ msgstr "Pořadí"
 #: js/Applications.js:288
 msgid "Version"
 msgstr "Verze"
+
+#: js/AdminPanel.js:48
+msgid "Default Addressbook for new contacts and groups"
+msgstr ""
+
+#: js/GroupEditDialog.js:73
+msgid "Could not save group."
+msgstr "Nepodařilo se uložit skupinu."
+
+#: js/GroupEditDialog.js:109
+msgid "Group Members"
+msgstr "Členové skupiny"
+
+#: js/GroupEditDialog.js:128
+msgid "Group Name"
+msgstr "Název skupiny"
+
+#: js/GroupEditDialog.js:216 js/Models.js:88
+#, fuzzy
+msgid "Group"
+msgid_plural "Groups"
+msgstr[0] "Skupina"
+msgstr[1] "Skupina"
+msgstr[2] "Skupina"
+
+#: js/GroupEditDialog.js:221 js/GroupEditDialog.js:232
+msgid "Add new group"
+msgstr "Přídat novou skupinu"
+
+#: js/GroupEditDialog.js:234
+msgid "Edit Group \"{0}\""
+msgstr "Editovat skupinu \"{0}\""
 
 #: js/TagEditDialog.js:38
 msgid "Updating Tag"
@@ -704,12 +716,61 @@ msgstr "Přidat nový štítek"
 msgid "Edit Tag \"{0}\""
 msgstr "Editovat štítek \"{0}\""
 
-#: js/SambaMachineModel.js:40
-msgid "Computer"
-msgid_plural "Computers"
-msgstr[0] "Počítač"
-msgstr[1] "Počítače"
-msgstr[2] "Počítačů"
+#: js/Roles.js:48
+msgid "Do you really want to delete the selected roles?"
+msgstr "Určitě chcete smazat vybrané role?"
+
+#: js/Roles.js:65
+msgid "Deleting role(s)..."
+msgstr "Mažu roli(e)..."
+
+#: js/Roles.js:103
+msgid "add role"
+msgstr "přidat roli"
+
+#: js/Roles.js:111
+msgid "edit role"
+msgstr "editovat roli"
+
+#: js/Roles.js:119
+msgid "delete role"
+msgstr "smazat roli"
+
+#: js/Roles.js:227
+msgid "Displaying roles {0} - {1} of {2}"
+msgstr "Zobrazuji role  {0} - {1} z {2}"
+
+#: js/Roles.js:228 js/Roles.js:283
+msgid "No roles to display"
+msgstr "Žádné role ke zobrazení"
+
+#: js/Tags.js:65
+msgid "Do you really want to delete the selected tags?"
+msgstr "Opravdu chcete smazat vybrané štítky?"
+
+#: js/Tags.js:83
+msgid "Deleting tag(s)..."
+msgstr "Mažu štítek(ky)..."
+
+#: js/Tags.js:98
+msgid "add tag"
+msgstr "přidat štítek"
+
+#: js/Tags.js:106
+msgid "edit tag"
+msgstr "editovat štítek"
+
+#: js/Tags.js:114
+msgid "delete tag"
+msgstr "smazat štítek"
+
+#: js/Tags.js:212
+msgid "Displaying tags {0} - {1} of {2}"
+msgstr "Zobrazuji štítky {0} - {1} of {2}"
+
+#: js/Tags.js:213 js/Tags.js:270
+msgid "No tags to display"
+msgstr "Žádné štítky ke zobrazení"
 
 #: js/AccessLog.js:108 js/AccessLog.js:134
 msgid "IP Address"
@@ -766,62 +827,6 @@ msgstr "chyba"
 #: js/AccessLog.js:186
 msgid "success"
 msgstr "úspěch"
-
-#: js/Tags.js:65
-msgid "Do you really want to delete the selected tags?"
-msgstr "Opravdu chcete smazat vybrané štítky?"
-
-#: js/Tags.js:83
-msgid "Deleting tag(s)..."
-msgstr "Mažu štítek(ky)..."
-
-#: js/Tags.js:98
-msgid "add tag"
-msgstr "přidat štítek"
-
-#: js/Tags.js:106
-msgid "edit tag"
-msgstr "editovat štítek"
-
-#: js/Tags.js:114
-msgid "delete tag"
-msgstr "smazat štítek"
-
-#: js/Tags.js:212
-msgid "Displaying tags {0} - {1} of {2}"
-msgstr "Zobrazuji štítky {0} - {1} of {2}"
-
-#: js/Tags.js:213 js/Tags.js:270
-msgid "No tags to display"
-msgstr "Žádné štítky ke zobrazení"
-
-#: js/Roles.js:48
-msgid "Do you really want to delete the selected roles?"
-msgstr "Určitě chcete smazat vybrané role?"
-
-#: js/Roles.js:65
-msgid "Deleting role(s)..."
-msgstr "Mažu roli(e)..."
-
-#: js/Roles.js:103
-msgid "add role"
-msgstr "přidat roli"
-
-#: js/Roles.js:111
-msgid "edit role"
-msgstr "editovat roli"
-
-#: js/Roles.js:119
-msgid "delete role"
-msgstr "smazat roli"
-
-#: js/Roles.js:227
-msgid "Displaying roles {0} - {1} of {2}"
-msgstr "Zobrazuji role  {0} - {1} z {2}"
-
-#: js/Roles.js:228 js/Roles.js:283
-msgid "No roles to display"
-msgstr "Žádné role ke zobrazení"
 
 #~ msgid "Quota (MB)"
 #~ msgstr "Kvóta (MB)"

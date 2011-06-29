@@ -1,13 +1,38 @@
-#: Setup/setup.xml:243
-msgid "Shared Contracts"
-msgstr ""
-
 #: Acl/Rights.php:104
 msgid "manage products"
 msgstr ""
 
 #: Acl/Rights.php:105
 msgid "add, edit and delete products"
+msgstr ""
+
+#: js/ContractEditDialog.js:97 js/ContractGridPanel.js:88
+msgid "Title"
+msgstr ""
+
+#: js/ContractEditDialog.js:102 js/ProductEditDialog.js:125
+#: js/ProductGridPanel.js:128
+msgid "Description"
+msgstr ""
+
+#: js/ContractEditDialog.js:103 js/ProductEditDialog.js:126
+msgid "Enter description..."
+msgstr ""
+
+#: js/ContractGridPanel.js:62 js/Models.js:79
+msgid "Quick search"
+msgstr ""
+
+#: js/ContractGridPanel.js:63
+msgid "Summary"
+msgstr ""
+
+#: js/ContractGridPanel.js:82
+msgid "Contract number"
+msgstr ""
+
+#: js/ContractGridPanel.js:94
+msgid "Status"
 msgstr ""
 
 #: js/ProductEditDialog.js:104 js/ProductGridPanel.js:125
@@ -26,13 +51,8 @@ msgstr ""
 msgid "Category"
 msgstr ""
 
-#: js/ProductEditDialog.js:125 js/ContractEditDialog.js:102
-#: js/ProductGridPanel.js:128
-msgid "Description"
-msgstr ""
-
-#: js/ProductEditDialog.js:126 js/ContractEditDialog.js:103
-msgid "Enter description..."
+#: js/ProductGridPanel.js:124
+msgid "Tags"
 msgstr ""
 
 #: js/Models.js:41
@@ -46,10 +66,6 @@ msgid "record list"
 msgid_plural "record lists"
 msgstr[0] ""
 msgstr[1] ""
-
-#: js/Models.js:79 js/ContractGridPanel.js:62
-msgid "Quick search"
-msgstr ""
 
 #: js/Models.js:80
 msgid "Product name"
@@ -67,22 +83,6 @@ msgid_plural "contracts lists"
 msgstr[0] ""
 msgstr[1] ""
 
-#: js/ContractEditDialog.js:97 js/ContractGridPanel.js:88
-msgid "Title"
-msgstr ""
-
-#: js/ContractGridPanel.js:63
-msgid "Summary"
-msgstr ""
-
-#: js/ContractGridPanel.js:82
-msgid "Contract number"
-msgstr ""
-
-#: js/ContractGridPanel.js:94
-msgid "Status"
-msgstr ""
-
 #: js/Sales.js:55
 msgid "Products"
 msgstr ""
@@ -99,6 +99,6 @@ msgstr ""
 msgid "All Contracts"
 msgstr ""
 
-#: js/ProductGridPanel.js:124
-msgid "Tags"
+#: Setup/setup.xml:243
+msgid "Shared Contracts"
 msgstr ""
