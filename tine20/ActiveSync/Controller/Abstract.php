@@ -166,13 +166,27 @@ abstract class ActiveSync_Controller_Abstract implements ActiveSync_Controller_I
     abstract public function getSupportedFolders();
     
     /**
-     * returns content controller of this backend
+     * Returns a set of records identified by their id's
      * 
-     * @return Tinebase_Controller_Record_Abstract
+     * @param   array $_ids       array of record identifiers
+     * @return  Tinebase_Record_RecordSet 
      */
-    public function getContentController()
+    public function getMultiple($_ids)
     {
-        return $this->_contentController;
+        $records = $this->_contentController->getMultiple($_ids);
+        
+        $firstRecord = $records->getFirstRecord();
+        if ($firstRecord) {
+            // get tags / alarms
+            if ($firstRecord->has('tags')) {
+                Tinebase_Tags::getInstance()->getMultipleTagsOfRecords($records);
+            }
+            if ($firstRecord->has('alarms')) {
+                $this->_contentController->getAlarms($records);
+            }
+        }
+        
+        return $records;
     }
     
     /**
@@ -355,12 +369,12 @@ abstract class ActiveSync_Controller_Abstract implements ActiveSync_Controller_I
     }
     
     /**
-     * get all entries changed between to dates
+     * get all entriy ids changed between to dates
      *
      * @param unknown_type $_field
      * @param unknown_type $_startTimeStamp
      * @param unknown_type $_endTimeStamp
-     * @return array
+     * @return array of ids
      */
     public function getChanged($_folderId, $_startTimeStamp, $_endTimeStamp = NULL)
     {
@@ -402,11 +416,11 @@ abstract class ActiveSync_Controller_Abstract implements ActiveSync_Controller_I
     }    
     
     /**
-     * get id's of all contacts available on the server
+     * get id's of all records available on the server
      *
      * @param string $_folderId
      * @param int $_filterType
-     * @return array
+     * @return array of ids
      */
     public function getServerEntries($_folderId, $_filterType)
     {

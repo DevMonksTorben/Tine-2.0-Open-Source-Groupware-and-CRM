@@ -496,7 +496,7 @@ class ActiveSync_Command_Sync extends ActiveSync_Command_Wbxml
                          * process added entries
                          */
                         // fetch estimated entries in one batch
-                        $serverEntries = $dataController->getContentController()->getMultiple(array_slice($serverAdds, 0, abs($collectionData['windowSize'] - $this->_totalCount), TRUE));
+                        $serverEntries = $dataController->getMultiple(array_slice($serverAdds, 0, abs($collectionData['windowSize'] - $this->_totalCount), TRUE));
                         
                         foreach($serverAdds as $id => $serverId) {
                             if($this->_totalCount === $collectionData['windowSize']) {
