@@ -20,6 +20,14 @@
           "path": "js/"
         },
         {
+          "text": "Model.js",
+          "path": "js/"
+        },
+        {
+          "text": "AdminPanel.js",
+          "path": "js/"
+        },
+        {
           "text": "AddressbookGridPanelHook.js",
           "path": "js/"
         },
