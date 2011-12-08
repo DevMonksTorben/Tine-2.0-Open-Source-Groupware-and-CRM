@@ -672,18 +672,5 @@ Tine.Sipgate.updateCallStateWindow = function(sessionId, contact) {
 
         }
     });
-};    
-/**
- * @namespace Tine.Sipgate
- * @class Tine.Sipgate.settingBackend
- * @extends Tine.Tinebase.data.RecordProxy
- * 
- * Settings Backend
- */ 
-Tine.Sipgate.settingsBackend = new Tine.Tinebase.data.RecordProxy({
-    appName: 'Sipgate',
-    modelName: 'Settings',
-    recordClass: Tine.Sipgate.Model.Settings
-});
 
-
+};
