@@ -176,14 +176,15 @@ class Sipgate_Backend_Api {
         $structAr['PeriodEnd'] = new Zend_XmlRpc_Value_DateTime($stop);
         $struct = new Zend_XmlRpc_Value_Struct($structAr);
 
+$resp = $this->_rpc->call('samurai.OwnUriListGet');
+die(var_dump($resp));
 
-
-        $resp = $this->_rpc->call('samurai.HistoryGetByDate',array(0 => $struct));
+        $resp = $this->_rpc->call('samurai.ItemizedEntriesGet',array(0 => $struct));
         $ret = false;
 
         if($resp) {
             $history = array_reverse($resp['History'],false);
-
+            if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(var_dump($history));
 
 
             if($resp['StatusCode'] === 200) {
