@@ -3,7 +3,7 @@
  * Tine 2.0
  *
  * @package     Sipgate
- * @subpackage        Preference
+ * @subpackage  Preference
  * @license     http://www.gnu.org/licenses/agpl.html AGPL3
  * @author      Alexander Stintzing <alex@stintzing.net>
  * @copyright   Copyright (c) 2011 Metaways Infosystems GmbH (http://www.metaways.de)
@@ -20,10 +20,6 @@
 class Sipgate_Preference extends Tinebase_Preference_Abstract
 {
         /**************************** application preferences/settings *****************/
-
-    const USERNAME = 'userName';
-    const PASSWORD = 'passWord';
-    const ACCOUNTTYPE = 'accountType';
 
         /**
          * The users phone
@@ -54,15 +50,10 @@ class Sipgate_Preference extends Tinebase_Preference_Abstract
          */
         public function getAllApplicationPreferences() {
 
-//            if()
-
                 $allPrefs = array(
                   self::PHONEID,
                   self::FAXID,
-//                  self::USERNAME,
-//                  self::PASSWORD,
-//                  self::ACCOUNTTYPE,
-//                  self::MOBILENUMBER
+                  self::MOBILENUMBER
                 );
 
                 return $allPrefs;
@@ -86,21 +77,6 @@ class Sipgate_Preference extends Tinebase_Preference_Abstract
                 'label'         => $translate->_('Your fax'),
                 'description'   => $translate->_('This is your fax'),
                 ),
-
-                self::USERNAME  => array(
-                'label'         => $translate->_('Sipgate API Username'),
-                'description'   => $translate->_('Same as used on sipgate.de'),
-        ),
-
-        self::PASSWORD  => array(
-                'label'         => $translate->_('Sipgate API Password'),
-                'description'   => $translate->_('Same as used on sipgate.de'),
-        ),
-
-        self::ACCOUNTTYPE  => array(
-                'label'         => $translate->_('Your Account Type'),
-                'description'   => $translate->_('Team or BasicPlus'),
-        ),
 
                 self::MOBILENUMBER  => array(
                 'label'         => $translate->_('Your mobile number'),
@@ -146,53 +122,58 @@ class Sipgate_Preference extends Tinebase_Preference_Abstract
          * @param string $_accountType
          * @return Tinebase_Model_Preference
          */
-        public function getApplicationPreferenceDefaults($_preferenceName, $_accountId = NULL, $_accountType = Tinebase_Acl_Rights::ACCOUNT_TYPE_USER)        {
-                switch($_preferenceName) {
 
-                        case self::PHONEID:
-                                $dev = array();
-                                try {
-                                        $_phones = Sipgate_Controller::getInstance()->getPhoneDevices();
-                                        foreach($_phones as $phone) {
-                                                $dev[] = $phone['SipUri'];
-                                        }
-                                } catch (Sipgate_Exception_Backend $seb) {
-                                        Tinebase_Core::getLogger()->warn(__METHOD__ . ' (' . __LINE__ . ') Could not get Sipgate phone devices: ' . $seb->getMessage());
-                                } catch (Zend_Exception $ze) {
-                                        Tinebase_Core::getLogger()->warn(__METHOD__ . ' (' . __LINE__ . ') Could not connect to sipgate: ' . $ze->getMessage());
-                                }
-                                $pref = $this->getOptions($_preferenceName, $dev);
-                                break;
 
-                        case self::FAXID:
-                                $dev = array();
-                                try {
-                                        $_faxes = Sipgate_Controller::getInstance()->getFaxDevices();
-                                        if (is_array($_faxes)) {
-                                                foreach($_faxes as $fax) {
-                                                        $dev[] = $fax['SipUri'];
-                                                }
-                                        }
-                                } catch (Sipgate_Exception_Backend $seb) {
-                                        Tinebase_Core::getLogger()->warn(__METHOD__ . ' (' . __LINE__ . ') Could not get Sipgate fax devices: ' . $seb->getMessage());
-                                } catch (Zend_Exception $ze) {
-                                        Tinebase_Core::getLogger()->warn(__METHOD__ . ' (' . __LINE__ . ') Could not connect to sipgate: ' . $ze->getMessage());
-                                }
-                                $pref = $this->getOptions($_preferenceName, $dev);
-                                break;
+        public function getApplicationPreferenceDefaults($_preferenceName, $_accountId = NULL, $_accountType = Tinebase_Acl_Rights::ACCOUNT_TYPE_USER)
+        {
+            switch($_preferenceName) {
+                case self::PHONEID:
 
-                        case self::MOBILENUMBER:
-                                $config = Tinebase_Core::getConfig()->sipgate;
-                                if ($config && $config->numbers && $config->numbers->mobile) {
-                                        $pref = $this->getOptions($_preferenceName, $config->numbers->mobile);
-                                } else {
-                                        $pref = $this->_getDefaultBasePreference($_preferenceName);
-                                }
-                                break;
-                        default:
-                                throw new Tinebase_Exception_NotFound('Default preference with name ' . $_preferenceName . ' not found.');
-                }
-                return $pref;
+                    $dev = array();
+                    try {
+                        $_phones = Sipgate_Controller::getInstance()->getPhoneDevices();
+                            foreach($_phones as $phone) {
+                                    $dev[] = $phone['SipUri'];
+                            }
+                    } catch (Sipgate_Exception_Backend $seb) {
+                            Tinebase_Core::getLogger()->warn(__METHOD__ . ' (' . __LINE__ . ') Could not get Sipgate phone devices: ' . $seb->getMessage());
+                    } catch (Zend_Exception $ze) {
+                            Tinebase_Core::getLogger()->warn(__METHOD__ . ' (' . __LINE__ . ') Could not connect to sipgate: ' . $ze->getMessage());
+                    }
+                    $pref = $this->getOptions($_preferenceName, $dev);
+                    break;
+                case self::FAXID:
+                    $dev = array();
+                    try {
+                            $_faxes = Sipgate_Controller::getInstance()->getFaxDevices();
+                            if (is_array($_faxes)) {
+                                    foreach($_faxes as $fax) {
+                                            $dev[] = $fax['SipUri'];
+                                    }
+                            }
+                    } catch (Sipgate_Exception_Backend $seb) {
+                            Tinebase_Core::getLogger()->warn(__METHOD__ . ' (' . __LINE__ . ') Could not get Sipgate fax devices: ' . $seb->getMessage());
+                    } catch (Zend_Exception $ze) {
+                            Tinebase_Core::getLogger()->warn(__METHOD__ . ' (' . __LINE__ . ') Could not connect to sipgate: ' . $ze->getMessage());
+                    }
+                    $pref = $this->getOptions($_preferenceName, $dev);
+                    break;
+
+                case self::MOBILENUMBER:
+                    $user = Tinebase_Core::getUser();
+                    $profile = Addressbook_Controller_Contact::getInstance()->getContactByUserId($user->getId(),true)->toArray();
+                    foreach($profile as $key => $value) {
+                        if((substr($key,0,4) == 'tel_') && (!empty($value))) {
+                            $numbers[] = $value;
+                        }
+                    }
+
+                    $pref = $this->getOptions($_preferenceName, $numbers);
+                    break;
+                default:
+                    throw new Tinebase_Exception_NotFound('Default preference with name ' . $_preferenceName . ' not found.');
+            }
+            return $pref;
         }
 
 }

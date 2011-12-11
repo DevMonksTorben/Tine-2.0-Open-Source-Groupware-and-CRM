@@ -62,7 +62,7 @@ class Sipgate_Frontend_Json extends Tinebase_Frontend_Json_Abstract
 
                 // Kein Plan, wo die Vorwahlen herkommen:
                 $stripPrefix = array('sip:2300','sip:2301','sip:2400','sip:','@sipgate.net','anonymous');
-                $stripRepl = array('','','','','');
+                $stripRepl = array('','','','','','');
 
                 $paging = array("start" => 0, "limit" => 1);
                 $ret = array();
@@ -175,12 +175,12 @@ class Sipgate_Frontend_Json extends Tinebase_Frontend_Json_Abstract
      *
      * @todo    return json store style with totalcount/result?
      */
-    public function getSettings()
-    {
-        $result = Sipgate_Controller::getInstance()->getConfigSettings()->toArray();
-
-        return $result;
-    }
+//    public function getSettings()
+//    {
+//        $result = Sipgate_Controller::getInstance()->getConfigSettings()->toArray();
+//
+//        return $result;
+//    }
 
         /**
          * Returns registry data
@@ -211,18 +211,18 @@ class Sipgate_Frontend_Json extends Tinebase_Frontend_Json_Abstract
         }
 
     /**
-     * Returns settings for crm app
+     * Returns settings for sipgate app
      *
      * @return  array record data
      *
      * @todo    return json store style with totalcount/result?
      */
-//    public function getSettings()
-//    {
-//        $result = Sipgate_Controller::getInstance()->getConfigSettings()->toArray();
-//
-//        return $result;
-//    }
+    public function getConfigSettings()
+    {
+        $result = Sipgate_Controller::getInstance()->getConfigSettings()->toArray();
+//die(var_dump($result));
+        return $result;
+    }
 
     /**
      * creates/updates settings
@@ -231,9 +231,9 @@ class Sipgate_Frontend_Json extends Tinebase_Frontend_Json_Abstract
      */
     public function saveConfigSettings($_values)
     {
-        $settings = new Sipgate_Model_Config($_values);
-        $result = Sipgate_Controller::getInstance()->saveConfigSettings($settings)->toArray();
 
+        $result = Sipgate_Controller::getInstance()->saveConfigSettings($_values)->toArray();
+//die(var_dump($result));
         return $result;
     }
 

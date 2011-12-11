@@ -19,12 +19,9 @@ Tine.Sipgate.getPanel = function() {
 
     var translation = new Locale.Gettext();
     translation.textdomain('Sipgate');
-
-    new Tine.Sipgate.AddressbookGridPanelHook({
-                app : {
-                    i18n : translation
-                }
-            });
+    var app = null;
+    new Tine.Sipgate.AddressbookGridPanelHook({app : { i18n : translation }});
+    
 // coming soon
 //    var editSipgateSettingsAction = new Ext.Action({
 //                text : translation._('Edit phone settings'),
@@ -673,6 +670,7 @@ Tine.Sipgate.updateCallStateWindow = function(sessionId, contact) {
         }
     });
 };    
+
 /**
  * @namespace Tine.Sipgate
  * @class Tine.Sipgate.settingBackend
