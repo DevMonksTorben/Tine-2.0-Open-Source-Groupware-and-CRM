@@ -29,6 +29,7 @@
 .SipgateCallStateList.accepted {background-image:url("../../images/../Sipgate/res/call_accepted.png") !important}
 .SipgateCallStateList.outgoing {background-image:url("../../images/../Sipgate/res/call_outgoing.png") !important}
 
+.SipgateAssignUsers {background-image:url("../../images/oxygen/16x16/actions/add-users.png") !important;}
 
 #csw-my-phone, #csw-line {float:left}
 #csw-other-phone {float:right;}

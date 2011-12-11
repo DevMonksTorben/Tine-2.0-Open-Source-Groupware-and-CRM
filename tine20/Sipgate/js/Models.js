@@ -10,6 +10,36 @@
  
 Ext.namespace('Tine.Sipgate', 'Tine.Sipgate.Model');
 
+Tine.Sipgate.Model.LineArray = [
+    { name: 'id' },
+    { name: 'account_id' },
+    { name: 'uri_alias' },
+    { name: 'sip_uri' },
+    { name: 'e164_out' },
+    { name: 'e164_in' },
+    { name: 'tos' },
+    { name: 'creation_time' }
+];
+
+Tine.Sipgate.Model.Line = Tine.Tinebase.data.Record.create(Tine.Sipgate.Model.LineArray, {
+    appName: 'Sipgate',
+    modelName: 'Line',
+    idProperty: 'id',
+    titleProperty: 'name',
+
+    recordName: 'Line',
+    recordsName: 'Lines',
+    containerProperty: null
+
+});
+
+Tine.Sipgate.lineBackend = new Tine.Tinebase.data.RecordProxy({
+    appName: 'Sipgate',
+    modelName: 'Line',
+    recordClass: Tine.Sipgate.Model.Line
+});
+
+
 /**
  * @namespace Tine.Sipgate.Model
  * @class Tine.Sipgate.Model.Settings
@@ -19,11 +49,7 @@ Ext.namespace('Tine.Sipgate', 'Tine.Sipgate.Model');
  */ 
  
 Tine.Sipgate.Model.Settings = Tine.Tinebase.data.Record.create([
-        {name: 'id'},
-        {name: 'defaults'},
-        {name: 'leadstates'},
-        {name: 'leadtypes'},
-        {name: 'leadsources'}
+        {name: 'id'}
 
     ], {
     appName: 'Sipgate',
@@ -33,7 +59,7 @@ Tine.Sipgate.Model.Settings = Tine.Tinebase.data.Record.create([
     // ngettext('Settings', 'Settings', n);
     recordName: 'Settings',
     recordsName: 'Settingss',
-    containerProperty: 'container_id',
+    containerProperty: null,
     // ngettext('record list', 'record lists', n);
     containerName: 'Settings',
     containersName: 'Settings',

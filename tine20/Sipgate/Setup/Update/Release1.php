@@ -47,6 +47,12 @@ class Sipgate_Setup_Update_Release1 extends Setup_Update_Abstract
                     <notnull>true</notnull>
                 </field>
                 <field>
+                    <name>account_id</name>
+                    <type>text</type>
+                    <length>40</length>
+                    <notnull>true</notnull>
+                </field>
+                <field>
                     <name>uri_alias</name>
                     <type>text</type>
                     <length>256</length>
@@ -90,6 +96,22 @@ class Sipgate_Setup_Update_Release1 extends Setup_Update_Abstract
                 </index>');
 
         $this->_backend->addPrimaryKey('sipgate_lines',$index);
+
+        $fk = new Setup_Backend_Schema_Index_Xml('<index>
+                    <name>sipgate_lines::account_id--accounts::id</name>
+                    <field>
+                        <name>account_id</name>
+                    </field>
+                    <foreign>true</foreign>
+                    <reference>
+                        <table>accounts</table>
+                        <field>id</field>
+                    </reference>
+                </index>');
+
+        $this->_backend->addForeignKey('sipgate_lines', $fk);
+
+        // create connection table
 
         $schema = new Setup_Backend_Schema_Table_Xml('<table>
             <name>sipgate_connections</name>
@@ -165,7 +187,7 @@ class Sipgate_Setup_Update_Release1 extends Setup_Update_Abstract
 
         $this->_backend->addIndex('sipgate_connections',$index);
 
-         $index = new Setup_Backend_Schema_Index_Xml('<index>
+        $index = new Setup_Backend_Schema_Index_Xml('<index>
                     <name>sipgate_connection::contact_id--addressbook::id</name>
                     <field>
                         <name>contact_id</name>

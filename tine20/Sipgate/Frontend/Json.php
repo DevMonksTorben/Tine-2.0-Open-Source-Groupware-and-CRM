@@ -220,6 +220,9 @@ class Sipgate_Frontend_Json extends Tinebase_Frontend_Json_Abstract
     public function getConfigSettings()
     {
         $result = Sipgate_Controller::getInstance()->getConfigSettings()->toArray();
+
+
+
 //die(var_dump($result));
         return $result;
     }
@@ -233,7 +236,18 @@ class Sipgate_Frontend_Json extends Tinebase_Frontend_Json_Abstract
     {
 
         $result = Sipgate_Controller::getInstance()->saveConfigSettings($_values)->toArray();
-//die(var_dump($result));
+
+        // Validate Settings
+
+        $api = Sipgate_Backend_Api::getInstance();
+
+        if($api->identify()) {
+            $result['valid'] = 1;
+        } else {
+            $result['valid'] = 0;
+            $result['error'] = $api->getException()->getMessage();
+        }
+
         return $result;
     }
 

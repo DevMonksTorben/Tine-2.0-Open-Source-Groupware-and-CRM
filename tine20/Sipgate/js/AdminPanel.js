@@ -48,6 +48,7 @@ Tine.Sipgate.AdminPanel = Ext.extend(Ext.FormPanel, {
     buttonAlign : null,
     bufferResize : 500,
     app:null,
+    validated: false,
     
     initComponent: function() {
         if (!this.app) {
@@ -68,7 +69,7 @@ Tine.Sipgate.AdminPanel = Ext.extend(Ext.FormPanel, {
   
     
     initButtons: function() {
-        this.fbar = [ '->', this.action_cancel, this.action_ok, this.action_close ];
+        this.fbar = [ '->', this.action_cancel, this.action_assign, this.action_ok, this.action_close ];
     },
     
     onRender: function(ct, position) {
@@ -106,6 +107,16 @@ Tine.Sipgate.AdminPanel = Ext.extend(Ext.FormPanel, {
             handler : this.onCancel,
             iconCls : 'action_cancel'
         });
+        
+        this.action_assign = new Ext.Action({
+            text : this.app.i18n._('Assign Accounts'),
+            minWidth : 70,
+            scope : this,
+            disabled: true,
+            handler : this.onAssignAccounts,
+            iconCls : 'SipgateAssignUsers'
+        });
+        
         this.action_close = new Ext.Action({
             text : this.app.i18n._('Close'),
             minWidth : 70,
@@ -125,7 +136,15 @@ Tine.Sipgate.AdminPanel = Ext.extend(Ext.FormPanel, {
     
     onUpdate: function() {
         Tine.log.debug(this.getForm().getValues());
-        this.saveSettings()
+        if(this.validated) this.onCancel();
+        else {
+            this.messageBox = Ext.Msg.wait(this.app.i18n._('Validating Sipgate Configuration'),this.app.i18n._('Please Wait'))
+            this.saveSettings();
+            
+//            var win = this;
+//            this.loadMask = new Ext.LoadMask(win, {msg: });
+        }
+        
     },
     
     loadRecord: function() {
@@ -161,6 +180,19 @@ Tine.Sipgate.AdminPanel = Ext.extend(Ext.FormPanel, {
         
     },
     
+    onValid: function() {
+        this.action_assign.enable(); 
+        this.validated = true;
+    },
+    
+    onAssignAccounts: function() {
+        var win = Tine.Sipgate.AssignAccountsGrid.openWindow();
+        win.on('update', function() {
+            win.onCancel();
+            this.onCancel();
+        },this);
+    },
+    
     saveSettings: function() {
         Ext.Ajax.request({
                 url : 'index.php',
@@ -171,7 +203,18 @@ Tine.Sipgate.AdminPanel = Ext.extend(Ext.FormPanel, {
 
                 },
                 success : function(_result, _request) {
-                    this.onCancel();
+                    this.messageBox.hide();
+                    var result = Ext.decode(_result.responseText);
+                    
+                    if(result.valid == 1) {
+                        Ext.Msg.alert(_('Connection succeeded'), _('The Connection to Sipgate succeeded!<br />Assign Accounts if not already done now.'));
+                        this.onValid();
+                    } else {
+                        this.validated = false;
+                        Ext.Msg.alert(_('Connection failed'), String.format(_('The Connection to Sipgate failed.<br /><br />Message: "{0}"'), result.error));
+                        this.action_assign.disable();
+                    }
+
                 }
             });
                 
@@ -194,12 +237,20 @@ Tine.Sipgate.AdminPanel = Ext.extend(Ext.FormPanel, {
                 items: [{
                         fieldLabel: this.app.i18n._('Username'),
                         xtype: 'textfield',
-                        name: 'username'
+                        name: 'username',
+                        listeners: {
+                            scope: this,
+                            change: function() { this.validated = false; this.action_assign.disable();}
+                        }
                     }, {
                         fieldLabel: this.app.i18n._('Password'),
                         xtype: 'textfield',
                         inputType: 'password',
-                        name: 'password'
+                        name: 'password',
+                        listeners: {
+                            scope: this,
+                            change: function() { this.validated = false; this.action_assign.disable();}
+                        }
                 }]
             }, {
                 xtype: 'fieldset',
@@ -210,15 +261,14 @@ Tine.Sipgate.AdminPanel = Ext.extend(Ext.FormPanel, {
                 items: [{ 
                   boxLabel: this.app.i18n._('Plus'), 
                   name: 'plus',
-//                  checked: (this.record.accounttype = 'plus') ? true : false,
                   xtype: 'checkbox',
                   bubbleEvents: ['check'],
                   listeners: {
                       scope: this, 
                       check: function() {
-//                          this.getForm().findField('plus');
                           this.getForm().findField('team').setValue(false);
-                          
+                          this.validated = false;
+                          this.action_assign.disable();
                       }
                   }
                 },
@@ -226,12 +276,12 @@ Tine.Sipgate.AdminPanel = Ext.extend(Ext.FormPanel, {
                   name: 'team',
                   xtype: 'checkbox',
                   bubbleEvents: ['check'],
-//                  checked: (this.record.accounttype = 'team') ? true : false,
                   listeners: {
                       scope: this, 
-                      check: function() {
-//                          this.getForm().findField('team').el.checked = 'checked';                        
+                      check: function() {                    
                           this.getForm().findField('plus').setValue(false);
+                          this.validated = false;
+                          this.action_assign.disable();
                       }
                   }
                         }  ]
@@ -272,24 +322,3 @@ Tine.Sipgate.AdminPanel.openWindow = function (config) {
     });
     return window;
 };
-
-//Ext.namespace('Tine.Crm.Admin');
-//
-///**
-// * @namespace   Tine.Crm.Admin
-// * @class       Tine.Crm.Admin.QuickaddGridPanel
-// * @extends     Tine.widgets.grid.QuickaddGridPanel
-// * 
-// * admin config option quickadd grid panel
-// */
-//Tine.Crm.Admin.QuickaddGridPanel = Ext.extend(Tine.widgets.grid.QuickaddGridPanel, {
-//
-//    /**
-//     * @private
-//     */
-//    initComponent: function() {
-//        this.app = this.app ? this.app : Tine.Tinebase.appMgr.get('Crm');
-//
-//        Tine.Crm.Admin.QuickaddGridPanel.superclass.initComponent.call(this);
-//    }
-//});

@@ -52,6 +52,8 @@ class Sipgate_Backend_Api {
 
     protected $_password;
 
+    protected $lastException;
+
     /**
      * the constructor
      *
@@ -74,14 +76,6 @@ class Sipgate_Backend_Api {
         $this->_http->setMethod('post');
 
         $this->_rpc = new Zend_XmlRpc_Client($this->_url, $this->_http->setAuth($this->_username, $this->_password));
-
-        $ret = $this->_rpc->call('samurai.ClientIdentify',
-                          array(0 => new Zend_XmlRpc_Value_Struct(array(
-                              'ClientName' => new Zend_XmlRpc_Value_String('Tine 2.0 Sipgate'),
-                              'ClientVersion' =>new Zend_XmlRpc_Value_String('1.1'),
-                              'ClientVendor' =>new Zend_XmlRpc_Value_String('Alexander Stintzing')
-        )))
-        );
 
     }
 
@@ -111,6 +105,31 @@ class Sipgate_Backend_Api {
         }
 
         return self::$_instance;
+    }
+
+    public function getException() {
+        return $this->lastException;
+    }
+
+    public function identify() {
+
+        try {
+            $this->_rpc->call('samurai.ClientIdentify',
+                          array(0 => new Zend_XmlRpc_Value_Struct(array(
+                              'ClientName' => new Zend_XmlRpc_Value_String('Tine 2.0 Sipgate'),
+                              'ClientVersion' =>new Zend_XmlRpc_Value_String('1.1'),
+                              'ClientVendor' =>new Zend_XmlRpc_Value_String('Alexander Stintzing')
+                )))
+            );
+
+            $ret = true;
+
+        } catch (Zend_XmlRpc_Client_HttpException $e) {
+            $this->lastException = $e;
+            $ret = false;
+        }
+
+        return $ret;
     }
 
     /**
@@ -175,9 +194,6 @@ class Sipgate_Backend_Api {
         $structAr['PeriodStart'] = new Zend_XmlRpc_Value_DateTime($start);
         $structAr['PeriodEnd'] = new Zend_XmlRpc_Value_DateTime($stop);
         $struct = new Zend_XmlRpc_Value_Struct($structAr);
-
-$resp = $this->_rpc->call('samurai.OwnUriListGet');
-die(var_dump($resp));
 
         $resp = $this->_rpc->call('samurai.ItemizedEntriesGet',array(0 => $struct));
         $ret = false;
