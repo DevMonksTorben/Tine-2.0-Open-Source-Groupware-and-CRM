@@ -141,8 +141,6 @@ Tine.Sipgate.AdminPanel = Ext.extend(Ext.FormPanel, {
             this.messageBox = Ext.Msg.wait(this.app.i18n._('Validating Sipgate Configuration'),this.app.i18n._('Please Wait'))
             this.saveSettings();
             
-//            var win = this;
-//            this.loadMask = new Ext.LoadMask(win, {msg: });
         }
         
     },

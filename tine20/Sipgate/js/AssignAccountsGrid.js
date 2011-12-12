@@ -25,16 +25,14 @@ Ext.namespace('Tine.Sipgate');
  * 
  * Create a new Tine.Sipgate.AssignAccountsGrid
  */
-Tine.Sipgate.AssignAccountsGrid = Ext.extend(Ext.grid.GridPanel, {
+Tine.Sipgate.AssignAccountsGrid = Ext.extend(Ext.grid.EditorGridPanel, {
 
     appName : 'Sipgate',
     loadMask : true,
     store: null,
     
-    defaultSortInfo: {field: 'id', direction: 'ASC'},
-    gridConfig: {
-        enableDragDrop: false
-    },
+    defaultSortInfo: {field: 'id', direction: 'ASC'},    
+    cm: null,
     
     recordClass: Tine.Sipgate.Model.Line,
     
@@ -46,40 +44,16 @@ Tine.Sipgate.AssignAccountsGrid = Ext.extend(Ext.grid.GridPanel, {
         }  
        
         this.recordProxy = Tine.Sipgate.lineBackend;
-        this.gridConfig.cm = this.getColumnModel();
+        this.cm = this.getColumnModel();
         this.initStore(); 
+        
         Tine.Sipgate.AssignAccountsGrid.superclass.initComponent.call(this);
     },
-    
+     
     initStore: function() {
-        if (this.recordProxy) {
-            this.store = new Ext.data.Store({
-                fields: this.recordClass,
-                proxy: this.recordProxy,
-//                reader: this.recordProxy.getReader(),
-                remoteSort: false,
-                sortInfo: this.defaultSortInfo,
-                listeners: {
-//                    scope: this,
-//                    'update': this.onStoreUpdate,
-//                    'beforeload': this.onStoreBeforeload,
-//                    'load': this.onStoreLoad,
-//                    'beforeloadrecords': this.onStoreBeforeLoadRecords,
-//                    'loadexception': this.onStoreLoadException
-                }
-            });
-        } else {
             this.store = new Tine.Tinebase.data.RecordStore({
                 recordClass: this.recordClass
             });
-        }
-        
-        // init autoRefresh
-//        this.autoRefreshTask = new Ext.util.DelayedTask(this.loadGridData, this, [{
-//            removeStrategy: 'keepBuffered',
-//            autoRefresh: true
-//        }]);
-        
         this.store.load();
     },
     
@@ -120,18 +94,31 @@ Tine.Sipgate.AssignAccountsGrid = Ext.extend(Ext.grid.GridPanel, {
     }
 });
 
+Tine.Sipgate.AssignAccountsGridContainer = new Ext.Viewport({
+    frame: false,
+    layout: 'fit',
+    items : [ {
+                region : 'center',
+                layout : {
+                    align : 'stretch',
+                    type : 'vbox'
+                }
+
+            }, Tine.Sipgate.AssignAccountsGrid ]
+    
+});
+
 /**
  * Sipgate admin settings popup
  * 
- * @param   {Object} config
  * @return  {Ext.ux.Window}
  */
-Tine.Sipgate.AssignAccountsGrid.openWindow = function (config) {
+Tine.Sipgate.AssignAccountsGrid.openWindow = function () {
     var window = Tine.WindowFactory.getWindow({
         width: 350,
         height: 200,
         name: 'SipgateAssignAccountsGridWindow',
-        contentPanelConstructor: 'Tine.Sipgate.AssignAccountsGrid'
+        contentPanelConstructor: 'Tine.Sipgate.AssignAccountsGridContainer'
     });
     return window;
 };
