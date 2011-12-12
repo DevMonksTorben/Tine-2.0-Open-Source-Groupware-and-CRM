@@ -77,7 +77,14 @@ class Sipgate_Model_Line extends Tinebase_Record_Abstract
      * @var array
      */
     protected $_validators = array(
-
+        'id'                    => array(Zend_Filter_Input::ALLOW_EMPTY => true, Zend_Filter_Input::DEFAULT_VALUE => NULL),
+        'account_id'            => array(Zend_Filter_Input::ALLOW_EMPTY => true),
+        'uri_alias'             => array(Zend_Filter_Input::ALLOW_EMPTY => true),
+        'sip_uri'               => array(Zend_Filter_Input::ALLOW_EMPTY => true),
+        'tos'                   => array(Zend_Filter_Input::ALLOW_EMPTY => true),
+        'e164_in'               => array(Zend_Filter_Input::ALLOW_EMPTY => true),
+        'e164_out'              => array(Zend_Filter_Input::ALLOW_EMPTY => true),
+        'creation_time'         => array(Zend_Filter_Input::ALLOW_EMPTY => true)
     );
 
     /**
@@ -86,10 +93,7 @@ class Sipgate_Model_Line extends Tinebase_Record_Abstract
      * @var array list of datetime fields
      */
     protected $_datetimeFields = array(
-        'timestamp',
-        'creation_time',
-        'last_modified_time',
-        'deleted_time'
+        'creation_time'
     );
 
 

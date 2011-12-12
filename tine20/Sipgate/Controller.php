@@ -112,6 +112,38 @@ class Sipgate_Controller extends Tinebase_Controller_Abstract
                 return $backend->closeSession($sessionId);
         }
 
+        public function syncLines() {
+
+            $devices = $this->getAllDevices();
+            $be = new Sipgate_Backend_Line();
+
+            $pagination = new Tinebase_Model_Pagination();
+
+            foreach($devices as $device) {
+                $filter = new Sipgate_Model_LineFilter(array(array('field' => 'sip_uri', 'operator' => 'equals', 'value' => $device['SipUri'])));
+                $result = $be->search($filter, $pagination);
+
+                if($result->count() == 0) {
+                    $newLine = new Sipgate_Model_Line(array(
+                        'account_id' => Tinebase_Core::getUser()->getId(),
+                        'sip_uri'    => $device['SipUri'],
+                        'uri_alias'  => $device['UriAlias'],
+                        'e164_out'   => $device['E164Out'],
+                        'e164_in'    => json_encode($device['E164In']),
+                        'tos'        => $device['TOS'][0],
+                        'creation_time' => time()
+
+                    ));
+
+                    $be->create($newLine);
+                } else {
+                    $updLine = $result->getFirstRecord();
+                    // TODO: apply Updates
+                }
+            }
+        }
+
+
         /**
          *
          * Gets the devices

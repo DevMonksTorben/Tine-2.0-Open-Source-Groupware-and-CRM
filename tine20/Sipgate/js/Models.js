@@ -25,10 +25,11 @@ Tine.Sipgate.Model.Line = Tine.Tinebase.data.Record.create(Tine.Sipgate.Model.Li
     appName: 'Sipgate',
     modelName: 'Line',
     idProperty: 'id',
-    titleProperty: 'name',
+    titleProperty: 'uri_alias',
 
     recordName: 'Line',
     recordsName: 'Lines',
+    
     containerProperty: null
 
 });

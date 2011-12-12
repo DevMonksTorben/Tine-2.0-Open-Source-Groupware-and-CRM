@@ -45,6 +45,18 @@ class Sipgate_Frontend_Json extends Tinebase_Frontend_Json_Abstract
                 return $ret;
         }
 
+        public function searchLines() {
+//            $be = new Sipgate_Backend_Line();
+//            $records = $be->getAll();
+            $filter = array();
+            $paging = array();
+
+            return $this->_search($filter, $paging, Sipgate_Controller_Line::getInstance(), 'Sipgate_Model_LineFilter');
+
+
+//            return array('success' => true, 'results' => $records->toArray());
+        }
+
         /**
          *
          * returns the Call History of the uri
@@ -106,12 +118,11 @@ class Sipgate_Frontend_Json extends Tinebase_Frontend_Json_Abstract
          * @return array
          */
         public function sendSms($_number,$_content)        {
-
-                //                $resp['responseText'] = '"response":{"StatusCode":200,"SessionID":"","StatusString":"Method success"}';
-
-                if(($resp = Sipgate_Controller::getInstance()->sendSms($_number,$_content)))
-                        return array('success' => true,'response'  => $resp);
-                return array('success' => false,'response'  => $resp);
+                if(($resp = Sipgate_Controller::getInstance()->sendSms($_number,$_content))) {
+                    return array('success' => true,'response'  => $resp);
+                } else {
+                    return array('success' => false,'response'  => $resp);
+                }
         }
 
         /**
@@ -134,7 +145,7 @@ class Sipgate_Frontend_Json extends Tinebase_Frontend_Json_Abstract
         public function getFaxDevices() {
                 $faxes = Sipgate_Controller::getInstance()->getFaxDevices();
                 if($faxes) {
-                        $ret = array('success' => true,'phones' => &$faxes);
+                        $ret = array('success' => true,'phones' => $faxes);
                 }
                 else {
                         $ret = array('error' => true);
@@ -242,6 +253,9 @@ class Sipgate_Frontend_Json extends Tinebase_Frontend_Json_Abstract
         $api = Sipgate_Backend_Api::getInstance();
 
         if($api->identify()) {
+
+            Sipgate_Controller::getInstance()->syncLines();
+
             $result['valid'] = 1;
         } else {
             $result['valid'] = 0;

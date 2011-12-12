@@ -25,10 +25,11 @@ Ext.namespace('Tine.Sipgate');
  * 
  * Create a new Tine.Sipgate.AssignAccountsGrid
  */
-Tine.Sipgate.AssignAccountsGrid = Ext.extend(Ext.grid.EditorGridPanel, {
+Tine.Sipgate.AssignAccountsGrid = Ext.extend(Ext.grid.GridPanel, {
 
     appName : 'Sipgate',
     loadMask : true,
+    store: null,
     
     defaultSortInfo: {field: 'id', direction: 'ASC'},
     gridConfig: {
@@ -46,9 +47,43 @@ Tine.Sipgate.AssignAccountsGrid = Ext.extend(Ext.grid.EditorGridPanel, {
        
         this.recordProxy = Tine.Sipgate.lineBackend;
         this.gridConfig.cm = this.getColumnModel();
-        
+        this.initStore(); 
         Tine.Sipgate.AssignAccountsGrid.superclass.initComponent.call(this);
     },
+    
+    initStore: function() {
+        if (this.recordProxy) {
+            this.store = new Ext.data.Store({
+                fields: this.recordClass,
+                proxy: this.recordProxy,
+//                reader: this.recordProxy.getReader(),
+                remoteSort: false,
+                sortInfo: this.defaultSortInfo,
+                listeners: {
+//                    scope: this,
+//                    'update': this.onStoreUpdate,
+//                    'beforeload': this.onStoreBeforeload,
+//                    'load': this.onStoreLoad,
+//                    'beforeloadrecords': this.onStoreBeforeLoadRecords,
+//                    'loadexception': this.onStoreLoadException
+                }
+            });
+        } else {
+            this.store = new Tine.Tinebase.data.RecordStore({
+                recordClass: this.recordClass
+            });
+        }
+        
+        // init autoRefresh
+//        this.autoRefreshTask = new Ext.util.DelayedTask(this.loadGridData, this, [{
+//            removeStrategy: 'keepBuffered',
+//            autoRefresh: true
+//        }]);
+        
+        this.store.load();
+    },
+    
+    
     
     /**
      * returns column model

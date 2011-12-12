@@ -111,20 +111,20 @@ class Sipgate_Backend_Api {
         return $this->lastException;
     }
 
+    /**
+     * Identifies and Validates Connection
+     */
     public function identify() {
-
         try {
             $this->_rpc->call('samurai.ClientIdentify',
-                          array(0 => new Zend_XmlRpc_Value_Struct(array(
-                              'ClientName' => new Zend_XmlRpc_Value_String('Tine 2.0 Sipgate'),
-                              'ClientVersion' =>new Zend_XmlRpc_Value_String('1.1'),
-                              'ClientVendor' =>new Zend_XmlRpc_Value_String('Alexander Stintzing')
-                )))
+              array(0 => new Zend_XmlRpc_Value_Struct(array(
+                  'ClientName' => new Zend_XmlRpc_Value_String('Tine 2.0 Sipgate'),
+                  'ClientVersion' =>new Zend_XmlRpc_Value_String('1.1'),
+                  'ClientVendor' =>new Zend_XmlRpc_Value_String('Alexander Stintzing')
+                  )))
             );
-
             $ret = true;
-
-        } catch (Zend_XmlRpc_Client_HttpException $e) {
+        } catch (Exception $e) {
             $this->lastException = $e;
             $ret = false;
         }

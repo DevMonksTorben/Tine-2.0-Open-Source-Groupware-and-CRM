@@ -14,7 +14,7 @@
  *
  * @package  Voipmanager
  */
-class Sipgate_Backend_Connection extends Tinebase_Backend_Sql_Abstract
+class Sipgate_Backend_Line extends Tinebase_Backend_Sql_Abstract
 {
     /**
      * Table name without prefix
