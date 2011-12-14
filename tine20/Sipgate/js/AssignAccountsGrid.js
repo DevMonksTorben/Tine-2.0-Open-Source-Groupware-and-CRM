@@ -96,15 +96,8 @@ Tine.Sipgate.AssignAccountsGrid = Ext.extend(Ext.grid.EditorGridPanel, {
 
 Tine.Sipgate.AssignAccountsGridContainer = new Ext.Viewport({
     frame: false,
-    layout: 'fit',
-    items : [ {
-                region : 'center',
-                layout : {
-                    align : 'stretch',
-                    type : 'vbox'
-                }
-
-            }, Tine.Sipgate.AssignAccountsGrid ]
+    layout: 'fit'
+    
     
 });
 
@@ -117,8 +110,16 @@ Tine.Sipgate.AssignAccountsGrid.openWindow = function () {
     var window = Tine.WindowFactory.getWindow({
         width: 350,
         height: 200,
-        name: 'SipgateAssignAccountsGridWindow',
-        contentPanelConstructor: 'Tine.Sipgate.AssignAccountsGridContainer'
+        name: 'SipgateAssignAccountsGridWindow'
+//        contentPanelConstructor: 'Tine.Sipgate.AssignAccountsGrid',
+//        contentPanelConstructorConfig: { items : [ {
+//                region : 'center',
+//                layout : {
+//                    align : 'stretch',
+//                    type : 'vbox'
+//                }
+//
+//            }, Tine.Sipgate.AssignAccountsGrid ] }
     });
     return window;
 };
