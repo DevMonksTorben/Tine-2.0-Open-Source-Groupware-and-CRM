@@ -18,18 +18,11 @@
 class Sipgate_Model_Config extends Tinebase_Record_Abstract
 {
     /**
-     * username config
+     * credentialCache config
      *
      * @var string
      */
-    const USERNAME = 'username';
-
-    /**
-     * password config
-     *
-     * @var string
-     */
-    const PASSWORD = 'password';
+    const CCID = 'ccId';
 
     /**
      * accounttype config
@@ -38,6 +31,8 @@ class Sipgate_Model_Config extends Tinebase_Record_Abstract
      */
     const ACCOUNTTYPE = 'accounttype';
 
+    const USERNAME = 'username';
+    const PASSWORD = 'password';
     /**
      * identifier
      *
@@ -58,9 +53,10 @@ class Sipgate_Model_Config extends Tinebase_Record_Abstract
      * @var array
      */
     protected $_validators = array(
-        'id'                => array('allowEmpty' => true ),
-        'username'        => array('allowEmpty' => true ),
-        'password'         => array('allowEmpty' => true ),
-        'accounttype'       => array('allowEmpty' => true ),
+        'id'          => array('allowEmpty' => true ),
+        'ccId'        => array('allowEmpty' => true ),
+        'username'    => array('allowEmpty' => true ),
+        'password'    => array('allowEmpty' => true ),
+        'accounttype' => array('allowEmpty' => false ),
     );
 }

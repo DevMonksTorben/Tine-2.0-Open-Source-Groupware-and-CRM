@@ -41,92 +41,52 @@ Tine.Sipgate.AdminPanel = Ext.extend(Ext.FormPanel, {
     bodyStyle : 'padding:5px',
     layout : 'fit',
     border : false,
+    record: null,
     cls : 'tw-editdialog',
     anchor : '100% 100%',
     deferredRender : false,
     buttonAlign : null,
     bufferResize : 500,
     app:null,
+    validated: false,
     
     initComponent: function() {
         if (!this.app) {
             this.app = Tine.Tinebase.appMgr.get(this.appName);
         }  
-        
-                // init actions
+        // init actions
         this.initActions();
-        // init buttons and tbar
-        this.initButtons();
         
-        // get items for this dialog
+        // init buttons and tbar
+        this.initButtons(); 
+        
+        this.loadRecord();
         this.items = this.getFormItems();
 
         Tine.Sipgate.AdminPanel.superclass.initComponent.call(this);
-
     },
     
   
     
     initButtons: function() {
-        this.fbar = [ '->', this.action_cancel, this.action_ok, this.action_close ];
+        this.fbar = [ '->', this.action_cancel, this.action_assign, this.action_ok, this.action_close ];
     },
-//
-//    onRender: function(ct, position) {
-//        Tine.widgets.dialog.EditDialog.superclass.onRender.call(this, ct, position);
-//
-//        // generalized keybord map for edit dlgs
-//        var map = new Ext.KeyMap(this.el, [ {
-//            key : [ 10, 13 ], // ctrl + return
-//            ctrl : true,
-//            fn : this.onSend,
-//            scope : this
-//        } ]);
-//
-//    },
-//    
-//    /**
-//     * executed after record got updated from proxy
-//     * 
-//     * @private
-//     */
-//    onRecordLoad: function() {
-//        if (! this.record.get('default_leadstate_id') ) {
-//            this.record.set('default_leadstate_id', this.record.data.defaults.leadstate_id);
-//            this.record.set('default_leadsource_id', this.record.data.defaults.leadsource_id);
-//            this.record.set('default_leadtype_id', this.record.data.defaults.leadtype_id);
-//        }
-//        
-//        if (this.fireEvent('load', this) !== false) {
-//            this.getForm().loadRecord(this.record);
-//            this.updateToolbars(this.record, this.recordClass.getMeta('containerProperty'));
-//            
-//            this.loadMask.hide();
-//        }
-//    },
-//    
-//    /**
-//     * executed when record gets updated from form
-//     * - add attachments to record here
-//     * 
-//     * @private
-//     * 
-//     */
-//    onRecordUpdate: function() {
-//        Tine.Sipgate.AdminPanel.superclass.onRecordUpdate.call(this);
-//        
-//        var defaults = {
-//            leadstate_id: this.record.get('default_leadstate_id'), 
-//            leadsource_id: this.record.get('default_leadsource_id'), 
-//            leadtype_id: this.record.get('default_leadtype_id')
-//        };
-//        
-//        this.record.set('defaults', defaults);
-//        
-//        // save leadstate / commit store
-//        this.record.set('leadstates', this.getFromStore(this.leadstatePanel.store));
-//        this.record.set('leadtypes', this.getFromStore(this.leadtypePanel.store));
-//        this.record.set('leadsources', this.getFromStore(this.leadsourcePanel.store));
-//    },
+    
+    onRender: function(ct, position) {
+        
+        this.loadMask = new Ext.LoadMask(ct, {msg: this.app.i18n._('Loading Sipgate Configuration')});
+        
+        Tine.widgets.dialog.EditDialog.superclass.onRender.call(this, ct, position);
+
+        // generalized keybord map for edit dlgs
+        var map = new Ext.KeyMap(this.el, [ {
+            key : [ 10, 13 ], // ctrl + return
+            ctrl : true,
+            fn : this.onUpdate,
+            scope : this
+        } ]);
+
+    },
  
     
     /**
@@ -147,6 +107,16 @@ Tine.Sipgate.AdminPanel = Ext.extend(Ext.FormPanel, {
             handler : this.onCancel,
             iconCls : 'action_cancel'
         });
+        
+        this.action_assign = new Ext.Action({
+            text : this.app.i18n._('Assign Accounts'),
+            minWidth : 70,
+            scope : this,
+            disabled: true,
+            handler : this.onAssignAccounts,
+            iconCls : 'SipgateAssignUsers'
+        });
+        
         this.action_close = new Ext.Action({
             text : this.app.i18n._('Close'),
             minWidth : 70,
@@ -166,7 +136,59 @@ Tine.Sipgate.AdminPanel = Ext.extend(Ext.FormPanel, {
     
     onUpdate: function() {
         Tine.log.debug(this.getForm().getValues());
-        this.saveSettings()
+        if(this.validated) this.onCancel();
+        else {
+            this.messageBox = Ext.Msg.wait(this.app.i18n._('Validating Sipgate Configuration'),this.app.i18n._('Please Wait'))
+            this.saveSettings();
+            
+        }
+        
+    },
+    
+    loadRecord: function() {
+        
+        if (! this.rendered) {
+            this.loadRecord.defer(250, this);
+            return;
+        }
+        
+        Ext.Ajax.request({
+                url : 'index.php',
+                scope: this,
+                params : {
+                    method : 'Sipgate.getConfigSettings'
+                },
+                success : function(_result, _request) {
+                    this.record = Ext.decode(_result.responseText);
+                    Tine.log.debug(this.record);
+
+                    if(this.record.username) {
+                        this.getForm().findField('username').setValue(this.record.username);
+                        this.getForm().findField('password').setValue(this.record.password);
+                    
+                        if(this.record.accounttype == 'plus') {
+                            this.getForm().findField('plus').setValue(true);
+                        } else {
+                            this.getForm().findField('team').setValue(true);
+                        }
+                    }
+                    this.loadMask.hide();
+                }
+            });
+        
+    },
+    
+    onValid: function() {
+        this.action_assign.enable(); 
+        this.validated = true;
+    },
+    
+    onAssignAccounts: function() {
+        var win = Tine.Sipgate.AssignAccountsGrid.openWindow();
+        win.on('update', function() {
+            win.onCancel();
+            this.onCancel();
+        },this);
     },
     
     saveSettings: function() {
@@ -179,7 +201,18 @@ Tine.Sipgate.AdminPanel = Ext.extend(Ext.FormPanel, {
 
                 },
                 success : function(_result, _request) {
-                    this.onCancel();
+                    this.messageBox.hide();
+                    var result = Ext.decode(_result.responseText);
+                    
+                    if(result.valid == 1) {
+                        Ext.Msg.alert(_('Connection succeeded'), _('The Connection to Sipgate succeeded!<br />Assign Accounts if not already done now.'));
+                        this.onValid();
+                    } else {
+                        this.validated = false;
+                        Ext.Msg.alert(_('Connection failed'), String.format(_('The Connection to Sipgate failed.<br /><br />Message: "{0}"'), result.error));
+                        this.action_assign.disable();
+                    }
+
                 }
             });
                 
@@ -202,12 +235,20 @@ Tine.Sipgate.AdminPanel = Ext.extend(Ext.FormPanel, {
                 items: [{
                         fieldLabel: this.app.i18n._('Username'),
                         xtype: 'textfield',
-                        name: 'username'
+                        name: 'username',
+                        listeners: {
+                            scope: this,
+                            change: function() { this.validated = false; this.action_assign.disable();}
+                        }
                     }, {
                         fieldLabel: this.app.i18n._('Password'),
                         xtype: 'textfield',
                         inputType: 'password',
-                        name: 'password'
+                        name: 'password',
+                        listeners: {
+                            scope: this,
+                            change: function() { this.validated = false; this.action_assign.disable();}
+                        }
                 }]
             }, {
                 xtype: 'fieldset',
@@ -218,15 +259,14 @@ Tine.Sipgate.AdminPanel = Ext.extend(Ext.FormPanel, {
                 items: [{ 
                   boxLabel: this.app.i18n._('Plus'), 
                   name: 'plus',
-                  checked: true,
                   xtype: 'checkbox',
                   bubbleEvents: ['check'],
                   listeners: {
                       scope: this, 
                       check: function() {
-//                          this.getForm().findField('plus');
                           this.getForm().findField('team').setValue(false);
-                          
+                          this.validated = false;
+                          this.action_assign.disable();
                       }
                   }
                 },
@@ -236,9 +276,10 @@ Tine.Sipgate.AdminPanel = Ext.extend(Ext.FormPanel, {
                   bubbleEvents: ['check'],
                   listeners: {
                       scope: this, 
-                      check: function() {
-//                          this.getForm().findField('team').el.checked = 'checked';                        
+                      check: function() {                    
                           this.getForm().findField('plus').setValue(false);
+                          this.validated = false;
+                          this.action_assign.disable();
                       }
                   }
                         }  ]
@@ -271,34 +312,11 @@ Tine.Sipgate.AdminPanel.onUpdate = function() {
  * @return  {Ext.ux.Window}
  */
 Tine.Sipgate.AdminPanel.openWindow = function (config) {
-//    var id = (config.record && config.record.id) ? config.record.id : 0;
     var window = Tine.WindowFactory.getWindow({
         width: 350,
         height: 200,
         name: Tine.Sipgate.AdminPanel.prototype.windowNamePrefix + id,
         contentPanelConstructor: 'Tine.Sipgate.AdminPanel'
-//        contentPanelConstructorConfig: config
     });
     return window;
 };
-
-//Ext.namespace('Tine.Crm.Admin');
-//
-///**
-// * @namespace   Tine.Crm.Admin
-// * @class       Tine.Crm.Admin.QuickaddGridPanel
-// * @extends     Tine.widgets.grid.QuickaddGridPanel
-// * 
-// * admin config option quickadd grid panel
-// */
-//Tine.Crm.Admin.QuickaddGridPanel = Ext.extend(Tine.widgets.grid.QuickaddGridPanel, {
-//
-//    /**
-//     * @private
-//     */
-//    initComponent: function() {
-//        this.app = this.app ? this.app : Tine.Tinebase.appMgr.get('Crm');
-//
-//        Tine.Crm.Admin.QuickaddGridPanel.superclass.initComponent.call(this);
-//    }
-//});

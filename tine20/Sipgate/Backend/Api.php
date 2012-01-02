@@ -52,31 +52,31 @@ class Sipgate_Backend_Api {
 
     protected $_password;
 
+    protected $lastException;
+
     /**
      * the constructor
      *
      * don't use the constructor. use the singleton
      */
-    private function __construct($_username, $_password, $_url)        {
+    private function __construct()        {
 
-        $this->_url = (empty($_url)) ? 'https://samurai.sipgate.net/RPC2' : $_url;
-        $this->_username = $_username;
-        $this->_password = $_password;
+        $this->config = Sipgate_Controller::getInstance()->getConfigSettings(true)->toArray();
+
+        if($this->config['accounttype'] == 'team') {
+            $this->_url = 'https://api.sipgate.net/RPC2';
+        } else {
+            $this->_url = 'https://samurai.sipgate.net/RPC2';
+        }
+
+        $this->_username = $this->config['username'];
+        $this->_password = $this->config['password'];
 
         $this->_http = new Zend_Http_Client($this->_url);
         $this->_http->setMethod('post');
-        $this->_http->setAuth($_username, $_password);
 
-        $this->_rpc = new Zend_XmlRpc_Client($this->_url,$this->_http->setAuth($_username, $_password));
+        $this->_rpc = new Zend_XmlRpc_Client($this->_url, $this->_http->setAuth($this->_username, $this->_password));
 
-        $this->_rpc->call(
-                        'samurai.ClientIdentify',
-        array(0 => new Zend_XmlRpc_Value_Struct(array(
-                                'ClientName' => new Zend_XmlRpc_Value_String('Tine 2.0 Sipgate'),
-                                'ClientVersion' =>new Zend_XmlRpc_Value_String('0.4'),
-                                'ClientVendor' =>new Zend_XmlRpc_Value_String('Alexander Stintzing')
-        )))
-        );
     }
 
 
@@ -98,13 +98,38 @@ class Sipgate_Backend_Api {
      *
      * @return Sipgate_Backend_Api
      */
-    public static function getInstance($_username, $_password, $_url)
+    public static function getInstance()
     {
         if (self::$_instance === NULL) {
-            self::$_instance = new Sipgate_Backend_Api($_username, $_password, $_url);
+            self::$_instance = new Sipgate_Backend_Api();
         }
 
         return self::$_instance;
+    }
+
+    public function getException() {
+        return $this->lastException;
+    }
+
+    /**
+     * Identifies and Validates Connection
+     */
+    public function identify() {
+        try {
+            $this->_rpc->call('samurai.ClientIdentify',
+              array(0 => new Zend_XmlRpc_Value_Struct(array(
+                  'ClientName' => new Zend_XmlRpc_Value_String('Tine 2.0 Sipgate'),
+                  'ClientVersion' =>new Zend_XmlRpc_Value_String('1.1'),
+                  'ClientVendor' =>new Zend_XmlRpc_Value_String('Alexander Stintzing')
+                  )))
+            );
+            $ret = true;
+        } catch (Exception $e) {
+            $this->lastException = $e;
+            $ret = false;
+        }
+
+        return $ret;
     }
 
     /**
@@ -159,10 +184,10 @@ class Sipgate_Backend_Api {
      * @return Zend_XmlRpc_Value_Struct
      */
     public function getCallHistory($_sipUri, $_start, $_stop, $_pstart, $_plimit) {
-         
+
         $start = strtotime($_start);
         $stop = strtotime($_stop);
-         
+
         $localUriList[] = new Zend_XmlRpc_Value_String($_sipUri);
         $structAr['LocalUriList'] = new Zend_XmlRpc_Value_Array($localUriList);
 
@@ -170,13 +195,13 @@ class Sipgate_Backend_Api {
         $structAr['PeriodEnd'] = new Zend_XmlRpc_Value_DateTime($stop);
         $struct = new Zend_XmlRpc_Value_Struct($structAr);
 
-
-
-        $resp = $this->_rpc->call('samurai.HistoryGetByDate',array(0 => $struct));
+        $resp = $this->_rpc->call('samurai.ItemizedEntriesGet',array(0 => $struct));
         $ret = false;
 
         if($resp) {
-            $history = array_reverse($resp['History'],false); 
+            $history = array_reverse($resp['History'],false);
+            if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(var_dump($history));
+
 
             if($resp['StatusCode'] === 200) {
                 for ($i = $_pstart; $i < $_pstart + $_plimit; $i++) {

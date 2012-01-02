@@ -84,7 +84,7 @@ class Sipgate_Controller extends Tinebase_Controller_Abstract
         {
                 $caller = $this->_pref->{'phoneId'};
 
-                $backend = Sipgate_Backend_Factory::factory();
+                $backend = Sipgate_Backend_Api::getInstance();
 
                 if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__
                   . ' Dialing number ' . $_callee . ' with phone id ' . $caller);
@@ -98,7 +98,7 @@ class Sipgate_Controller extends Tinebase_Controller_Abstract
          */
         public function getSessionStatus($sessionId) {
                 if(empty($sessionId)) throw new Sipgate_Exception('No Session-Id in Controller submitted!');
-                $backend = Sipgate_Backend_Factory::factory();
+                $backend = Sipgate_Backend_Api::getInstance();
                 return $backend->getSessionStatus($sessionId);
         }
 
@@ -108,16 +108,51 @@ class Sipgate_Controller extends Tinebase_Controller_Abstract
          */
         public function closeSession($sessionId) {
                 if(empty($sessionId)) throw new Sipgate_Exception('No Session-Id in Controller submitted!');
-                $backend = Sipgate_Backend_Factory::factory();
+                $backend = Sipgate_Backend_Api::getInstance();
                 return $backend->closeSession($sessionId);
         }
+
+        public function syncLines() {
+
+            $devices = $this->getAllDevices();
+            $be = new Sipgate_Backend_Line();
+
+            $pagination = new Tinebase_Model_Pagination();
+
+            foreach($devices as $device) {
+                $filter = new Sipgate_Model_LineFilter(array(array('field' => 'sip_uri', 'operator' => 'equals', 'value' => $device['SipUri'])));
+                $result = $be->search($filter, $pagination);
+
+                if($result->count() == 0) {
+                    $newLine = new Sipgate_Model_Line(array(
+                        'account_id' => Tinebase_Core::getUser()->getId(),
+                        'sip_uri'    => $device['SipUri'],
+                        'uri_alias'  => $device['UriAlias'],
+                        'e164_out'   => $device['E164Out'],
+                        'e164_in'    => json_encode($device['E164In']),
+                        'tos'        => $device['TOS'][0],
+                        'creation_time' => time()
+
+                    ));
+
+                    $be->create($newLine);
+                } else {
+                    $updLine = $result->getFirstRecord();
+                    // TODO: apply Updates
+                }
+            }
+        }
+
 
         /**
          *
          * Gets the devices
          */
         public function getAllDevices() {
-                $backend = Sipgate_Backend_Factory::factory();
+
+
+
+                $backend = Sipgate_Backend_Api::getInstance();
                 return $backend->getAllDevices();
         }
 
@@ -127,13 +162,10 @@ class Sipgate_Controller extends Tinebase_Controller_Abstract
          * @return array
          */
         public function getPhoneDevices() {
-                $backend = Sipgate_Backend_Factory::factory();
+                $backend = Sipgate_Backend_Api::getInstance();
 
-                if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__
-          . ' Getting sipgate phones.');
-
+                if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' Getting sipgate phones.');
                 $result = $backend->getPhoneDevices();
-
                 if (Tinebase_Core::isLogLevel(Zend_Log::TRACE)) Tinebase_Core::getLogger()->trace(__METHOD__ . '::' . __LINE__ . ' ' . print_r($result, TRUE));
 
                 return $result;
@@ -144,7 +176,7 @@ class Sipgate_Controller extends Tinebase_Controller_Abstract
          * Gets the Faxes
          */
         public function getFaxDevices() {
-                $backend = Sipgate_Backend_Factory::factory();
+                $backend = Sipgate_Backend_Api::getInstance();
                 return $backend->getFaxDevices();
         }
 
@@ -156,7 +188,7 @@ class Sipgate_Controller extends Tinebase_Controller_Abstract
 
         public function getCallHistory($_sipUri, $_start, $_stop, $_pstart, $_plimit) {
 
-                return Sipgate_Backend_Factory::factory()->getCallHistory($_sipUri, $_start, $_stop, $_pstart, $_plimit);
+                return Sipgate_Backend_Api::getInstance()->getCallHistory($_sipUri, $_start, $_stop, $_pstart, $_plimit);
         }
 
 
@@ -169,7 +201,7 @@ class Sipgate_Controller extends Tinebase_Controller_Abstract
         public function sendSms($_number,$_content)
         {
                 $_sender = $this->_pref->getValue('mobileNumber');
-                $backend = Sipgate_Backend_Factory::factory();
+                $backend = Sipgate_Backend_Api::getInstance();
                 return $backend->sendSms($_sender, $_number, $_content);
         }
 
@@ -185,46 +217,29 @@ class Sipgate_Controller extends Tinebase_Controller_Abstract
      */
     public function getConfigSettings($_resolve = FALSE)
     {
-        $cache = Tinebase_Core::get('cache');
-        $cacheId = convertCacheId('getSipgateSettings');
-        $result = $cache->load($cacheId);
+//        return array('success' => 1);
+//        $cache = Tinebase_Core::get('cache');
+//        $cacheId = convertCacheId('getSipgateSettings');
+//        $result = $cache->load($cacheId);
+//        if (! $result) {
+            $settings = Tinebase_Config::getInstance()->getConfigAsArray('account_settings','Sipgate');
 
-        if (! $result) {
-
-            $translate = Tinebase_Translation::getTranslation('Sipgate');
-
-            $result = new Sipgate_Model_Config(array(
-                'defaults' => parent::getConfigSettings()
-            ));
-
-            $others = array(
-                Crm_Model_Config::LEADTYPES => array(
-                    array('id' => 1, 'leadtype' => $translate->_('Customer')),
-                    array('id' => 2, 'leadtype' => $translate->_('Partner')),
-                    array('id' => 3, 'leadtype' => $translate->_('Reseller')),
-                ),
-                Crm_Model_Config::LEADSTATES => array(
-                    array('id' => 1, 'leadstate' => $translate->_('open'),                  'probability' => 0,     'endslead' => 0),
-                    array('id' => 2, 'leadstate' => $translate->_('contacted'),             'probability' => 10,    'endslead' => 0),
-                    array('id' => 3, 'leadstate' => $translate->_('waiting for feedback'),  'probability' => 30,    'endslead' => 0),
-                    array('id' => 4, 'leadstate' => $translate->_('quote sent'),            'probability' => 50,    'endslead' => 0),
-                    array('id' => 5, 'leadstate' => $translate->_('accepted'),              'probability' => 100,   'endslead' => 1),
-                    array('id' => 6, 'leadstate' => $translate->_('lost'),                  'probability' => 0,     'endslead' => 1),
-                ),
-                Crm_Model_Config::LEADSOURCES => array(
-                    array('id' => 1, 'leadsource' => $translate->_('Market')),
-                    array('id' => 2, 'leadsource' => $translate->_('Email')),
-                    array('id' => 3, 'leadsource' => $translate->_('Telephone')),
-                    array('id' => 4, 'leadsource' => $translate->_('Website')),
-                )
-            );
-            foreach ($others as $setting => $defaults) {
-                $result->$setting = Tinebase_Config::getInstance()->getConfigAsArray($setting, $this->_applicationName, $defaults);
+            if($_resolve) {
+                $cc = Tinebase_Auth_CredentialCache::getInstance()->get($settings['ccId']);
+                $cc->key = 'sipgate_credential_cache';
+                Tinebase_Auth_CredentialCache::getInstance()->getCachedCredentials($cc);
+                $settings['password'] = $cc->password;
+            } else {
+                $settings['password'] = 'XXXXXX';
             }
 
+            $result = new Sipgate_Model_Config($settings);
+
+//            unset($settings['ccId']);
+//die(var_dump($settings));
             // save result and tag it with 'settings'
-            $cache->save($result, $cacheId, array('settings'));
-        }
+//            $cache->save($cc, $cacheId, array('getSipgateSettings'));
+//        }
 
         return $result;
     }
@@ -237,30 +252,37 @@ class Sipgate_Controller extends Tinebase_Controller_Abstract
      *
      * @todo generalize this
      */
-    public function saveConfigSettings($_settings)
+    public function saveConfigSettings($_values)
     {
-//          die(var_dump($_settings));
 
-//        if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' Updating Crm Settings: ' . print_r($_settings->toArray(), TRUE));
-//
-        foreach ($_settings->toArray() as $field => $value) {
-//            var_dump($field);
-//        }
-//            if ($field == 'id') {
-//                continue;
-//            } else if ($field == 'defaults') {
-//                parent::saveConfigSettings($value);
-//            } else {
-                Tinebase_Config::getInstance()->setConfigForApplication($field, Zend_Json::encode($value), $this->_applicationName);
-//            }
-//        }
-//
-//        // invalidate cache
-//        Tinebase_Core::get('cache')->clean(Zend_Cache::CLEANING_MODE_MATCHING_TAG, array('settings'));
-//
-return  true;
+        // Get Password
+        if($_values['password'] == 'XXXXXX') {
+            $settings = Tinebase_Config::getInstance()->getConfigAsArray('account_settings','Sipgate');
+            $cc = Tinebase_Auth_CredentialCache::getInstance()->get($settings['ccId']);
+            $cc->key = 'sipgate_credential_cache';
+            Tinebase_Auth_CredentialCache::getInstance()->getCachedCredentials($cc);
+            $_values['password'] = $cc->password;
+        }
+
+        if ($_values['plus']) $values['accounttype'] = 'plus';
+        else $values['accounttype'] = 'team';
+
+        if ($_values['password'] && $_values['username']) {
+            $cc = Tinebase_Auth_CredentialCache::getInstance()->cacheCredentials($_values['username'], $_values['password'], 'sipgate_credential_cache');
+            $ccRes = $cc->getCacheId();
+            $values['ccId'] = $ccRes['id'];
+            $values['username'] = $_values['username'];
+        } else {
+            return json_encode(array('success' => false));
+        }
+
+        $settings = new Sipgate_Model_Config($values);
+
+        Tinebase_Config::getInstance()->setConfigForApplication('account_settings', Zend_Json::encode($settings->toArray()), $this->_applicationName);
+        Tinebase_Core::get('cache')->clean(Zend_Cache::CLEANING_MODE_MATCHING_TAG, array('sipgateSettings'));
+
         return $this->getConfigSettings();
-    }
+
     }
 
 }

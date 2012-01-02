@@ -20,7 +20,7 @@
           "path": "js/"
         },
         {
-          "text": "Model.js",
+          "text": "Models.js",
           "path": "js/"
         },
         {
@@ -29,6 +29,10 @@
         },
         {
           "text": "AddressbookGridPanelHook.js",
+          "path": "js/"
+        },
+        {
+          "text": "AssignAccountsGrid.js",
           "path": "js/"
         },
         {
