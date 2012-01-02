@@ -152,6 +152,10 @@
           "path": "js/ux/file/"
         },
         {
+          "text": "MonthPickerPlugin.js",
+          "path": "js/ux/form/"
+        },        
+        {
           "text": "ColorField.js",
           "path": "js/ux/form/"
         },
@@ -356,10 +360,6 @@
           "path": "js/widgets/"
         },
         {
-          "text": "Priority.js",
-          "path": "js/widgets/"
-        },
-        {
           "text": "VersionCheck.js",
           "path": "js/widgets/"
         },
@@ -374,7 +374,11 @@
         {
           "text": "MultipleEditDialogPlugin.js",
           "path": "js/widgets/dialog/"
-        },        
+        },
+        {
+          "text": "TokenModeEditDialogPlugin.js",
+          "path": "js/widgets/dialog/"
+        },
         {
           "text": "WizardPanel.js",
           "path": "js/widgets/dialog/"
@@ -568,6 +572,10 @@
           "path": "js/widgets/container/"
         },
         {
+          "text": "PropertiesDialog.js",
+          "path": "js/widgets/container/"
+        },
+        {
           "text": "FilterModel.js",
           "path": "js/widgets/container/"
         },
@@ -582,7 +590,7 @@
         {
           "text": "TagToggleBox.js",
           "path": "js/widgets/tags/"
-        },        
+        },
         {
           "text": "TagFilter.js",
           "path": "js/widgets/tags/"
@@ -594,7 +602,7 @@
         {
           "text": "TagsMassDetachAction.js",
           "path": "js/widgets/tags/"
-        },        
+        },
         {
           "text": "WestPanel.js",
           "path": "js/widgets/mainscreen/"

@@ -64,10 +64,7 @@ Tine.widgets.dialog.EditDialog = Ext.extend(Ext.FormPanel, {
      * record in edit process.
      */
     record: null,
-    /**
-     * @cfg GridPanel SelectionModel
-     */
-    sm: null,
+
     /**
      * @cfg {String} saveAndCloseButtonText
      * text of save and close button
@@ -108,6 +105,10 @@ Tine.widgets.dialog.EditDialog = Ext.extend(Ext.FormPanel, {
      * @type Array
      */
     disableOnEditMultiple: null,
+    
+    selectedRecords: null,
+    selectionFilter: null,
+        
     
     /**
      * @property window {Ext.Window|Ext.ux.PopupWindow|Ext.Air.Window}
@@ -181,6 +182,9 @@ Tine.widgets.dialog.EditDialog = Ext.extend(Ext.FormPanel, {
             Tine.log.debug('initComponent: modelName: ', this.modelName);
             Tine.log.debug('initComponent: app: ', this.app);
             
+            this.selectedRecords = Ext.decode(this.selectedRecords);
+            this.selectionFilter = Ext.decode(this.selectionFilter);
+            
             // init some translations
             if (this.app.i18n && this.recordClass !== null) {
                 this.i18nRecordName = this.app.i18n.n_hidden(this.recordClass.getMeta('recordName'), this.recordClass.getMeta('recordsName'), 1);
@@ -197,6 +201,7 @@ Tine.widgets.dialog.EditDialog = Ext.extend(Ext.FormPanel, {
             // init cf plugin
             this.plugins = this.plugins ? this.plugins : [];
             this.plugins.push(new Tine.widgets.customfields.EditDialogPlugin({}));
+            this.plugins.push(this.tokenModePlugin = new Tine.widgets.dialog.TokenModeEditDialogPlugin({}));
                    
             if(this.useMultiple) this.plugins.push(new Tine.widgets.dialog.MultipleEditDialogPlugin({}));
             
@@ -315,6 +320,7 @@ Tine.widgets.dialog.EditDialog = Ext.extend(Ext.FormPanel, {
      * init record to edit
      */
     initRecord: function() {
+        
         Tine.log.debug('init record with mode: ' + this.mode);
         if (! this.record) {
             Tine.log.debug('creating new default data record');
@@ -648,10 +654,25 @@ Tine.widgets.dialog.EditDialog = Ext.extend(Ext.FormPanel, {
         Tine.Tinebase.ExceptionHandler.handleRequestException(exception);
     },
     
+    /**
+     * add given item disable registry for multiple edit
+     * 
+     * NOTE: this function can be called from any child's scope also
+     * 
+     * @param {Ext.Component} item
+     */
     addToDisableOnEditMultiple: function(item) {
-        Tine.log.debug(item);
-        if(!this.disableOnEditMultiple) this.disableOnEditMultiple = new Array();
-        this.disableOnEditMultiple.push(item);
+        
+        var mgrCmpTest = function(p) {return Ext.isFunction(p.addToDisableOnEditMultiple);},
+            me = mgrCmpTest(this) ? this : this.findParentBy(mgrCmpTest);
+            
+        if (me) {
+            me.disableOnEditMultiple = me.disableOnEditMultiple || [];
+            if (me.disableOnEditMultiple.indexOf(item) < 0) {
+                Tine.log.debug('Tine.widgets.dialog.EditDialog::addToDisableOnEditMultiple ' + item.id);
+                me.disableOnEditMultiple.push(item);
+            }
+        }
     },
     
     getDisableOnEditMultiple: function() {

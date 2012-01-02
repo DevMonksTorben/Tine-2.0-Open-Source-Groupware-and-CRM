@@ -194,23 +194,19 @@ class Tinebase_Core
             $server = new ActiveSync_Server_Http();
 
 
-            /**************************** WEBDAV API **********************************
+            /**************************** WebDAV / CardDAV / CalDAV API **********************************
              * RewriteCond %{REQUEST_METHOD} !^(GET|POST)$
-             * RewriteRule ^/$      /index.php [E=WEBDAV:true,E=REDIRECT_WEBDAV:true,E=REMOTE_USER:%{HTTP:Authorization},L]
+             * RewriteRule ^/$            /index.php [E=WEBDAV:true,E=REDIRECT_WEBDAV:true,E=REMOTE_USER:%{HTTP:Authorization},L]
              *
-             * RewriteRule ^/webdav /index.php [E=WEBDAV:true,E=REDIRECT_WEBDAV:true,E=REMOTE_USER:%{HTTP:Authorization},L]
+             * RewriteRule ^/addressbooks /index.php [E=WEBDAV:true,E=REDIRECT_WEBDAV:true,E=REMOTE_USER:%{HTTP:Authorization},L]
+             * RewriteRule ^/calendars    /index.php [E=WEBDAV:true,E=REDIRECT_WEBDAV:true,E=REMOTE_USER:%{HTTP:Authorization},L]
+             * RewriteRule ^/principals   /index.php [E=WEBDAV:true,E=REDIRECT_WEBDAV:true,E=REMOTE_USER:%{HTTP:Authorization},L]
+             * RewriteRule ^/webdav       /index.php [E=WEBDAV:true,E=REDIRECT_WEBDAV:true,E=REMOTE_USER:%{HTTP:Authorization},L]
              */
         } elseif(isset($_SERVER['REDIRECT_WEBDAV']) && $_SERVER['REDIRECT_WEBDAV'] == 'true') {
-            $server = new Tinebase_Server_WebDav();
+            $server = new Tinebase_Server_WebDAV();
 
-
-            /**************************** CALDAV API **********************************
-             * RewriteRule ^/caldav /index.php [E=CALDAV:true,E=REDIRECT_CALDAV:true,E=REMOTE_USER:%{HTTP:Authorization},L]
-             */
-        } elseif(isset($_SERVER['REDIRECT_CALDAV']) && $_SERVER['REDIRECT_CALDAV'] == 'true') {
-            $server = new Tinebase_Server_CalDav();
-
-
+            
             /**************************** CLI API *****************************/
         } elseif (php_sapi_name() == 'cli') {
             $server = new Tinebase_Server_Cli();
@@ -541,7 +537,15 @@ class Tinebase_Core
             }
 
             Tinebase_Core::getLogger()->INFO(__METHOD__ . '::' . __LINE__ . " cache of backend type '{$backendType}' enabled");
-            if (Tinebase_Core::isLogLevel(Zend_Log::TRACE)) Tinebase_Core::getLogger()->trace(__METHOD__ . '::' . __LINE__ . " backend options: " . print_r($backendOptions, TRUE));
+            
+            if (Tinebase_Core::isLogLevel(Zend_Log::TRACE)) {
+                // logger is an object, that makes ugly traces :)
+                $backendOptionsWithoutLogger = $backendOptions;
+                if (isset($backendOptionsWithoutLogger['logger'])) {
+                    unset($backendOptionsWithoutLogger['logger']);
+                }
+                Tinebase_Core::getLogger()->trace(__METHOD__ . '::' . __LINE__ . " backend options: " . print_r($backendOptionsWithoutLogger, TRUE));
+            }
 
         } else {
             Tinebase_Core::getLogger()->INFO(__METHOD__ . '::' . __LINE__ . ' cache disabled');

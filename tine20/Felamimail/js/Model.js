@@ -39,7 +39,8 @@ Tine.Felamimail.Model.Message = Tine.Tinebase.data.Record.create([
       { name: 'attachments' },
       { name: 'original_id' },
       { name: 'folder_id' },
-      { name: 'note' }
+      { name: 'note' },
+      { name: 'preparedParts' } // contains invitation event record
     ], {
     appName: 'Felamimail',
     modelName: 'Message',
@@ -329,6 +330,7 @@ Tine.Felamimail.Model.Account = Tine.Tinebase.data.Record.create(Tine.Tinebase.M
     { name: 'ns_other' },
     { name: 'ns_shared' },
     { name: 'signature' },
+    { name: 'signature_position' },
     { name: 'smtp_port' },
     { name: 'smtp_hostname' },
     { name: 'smtp_auth' },

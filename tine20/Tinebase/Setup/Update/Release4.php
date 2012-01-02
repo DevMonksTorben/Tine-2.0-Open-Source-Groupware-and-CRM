@@ -326,11 +326,19 @@ class Tinebase_Setup_Update_Release4 extends Setup_Update_Abstract
         $this->setTableVersion('async_job', '2');
         $this->setApplicationVersion('Tinebase', '4.9');
     }
-        
+    
     /**
      * update to 5.0
      */
     public function update_9()
+    {
+        $this->setApplicationVersion('Tinebase', '5.0');
+    }
+
+    /**
+     * update to 5.0
+     */
+    public function update_10()
     {
         $this->setApplicationVersion('Tinebase', '5.0');
     }

@@ -20,6 +20,10 @@
           "path": "js/"
         },
         {
+          "text": "SearchCombo.js",
+          "path": "js/"
+        },
+        {
           "text": "Model.js",
           "path": "js/"
         },
@@ -121,6 +125,18 @@
         },
         {
           "text": "ContactEventsGridPanel.js",
+          "path": "js/"
+        },
+        {
+          "text": "iMIPDetailsPanel.js",
+          "path": "js/"
+        },
+        {
+          "text": "CalDAVContainerPropertiesHookField.js",
+          "path": "js/"
+        },
+        {
+          "text": "AddToEventPanel.js",
           "path": "js/"
         }
       ]
