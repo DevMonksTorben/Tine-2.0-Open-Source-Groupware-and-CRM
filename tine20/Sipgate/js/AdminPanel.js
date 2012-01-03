@@ -269,27 +269,22 @@ Tine.Sipgate.AdminPanel = Ext.extend(Ext.FormPanel, {
                           this.action_assign.disable();
                       }
                   }
-                },
-                { boxLabel: this.app.i18n._('Team'), 
-                  name: 'team',
-                  xtype: 'checkbox',
-                  bubbleEvents: ['check'],
-                  listeners: {
-                      scope: this, 
-                      check: function() {                    
-                          this.getForm().findField('plus').setValue(false);
-                          this.validated = false;
-                          this.action_assign.disable();
-                      }
-                  }
-                        }  ]
+                }, { 
+                    boxLabel: this.app.i18n._('Team'), 
+                    name: 'team',
+                    xtype: 'checkbox',
+                    bubbleEvents: ['check'],
+                    listeners: {
+                        scope: this, 
+                        check: function() {                    
+                            this.getForm().findField('plus').setValue(false);
+                            this.validated = false;
+                            this.action_assign.disable();
+                        }
+                    }
+                }]
             }
-            
-            
-            
-            ]
-              
-        };
+        ]};
     }
 });
 
@@ -314,7 +309,7 @@ Tine.Sipgate.AdminPanel.onUpdate = function() {
 Tine.Sipgate.AdminPanel.openWindow = function (config) {
     var window = Tine.WindowFactory.getWindow({
         width: 350,
-        height: 200,
+        height: 250,
         name: Tine.Sipgate.AdminPanel.prototype.windowNamePrefix + id,
         contentPanelConstructor: 'Tine.Sipgate.AdminPanel'
     });
