@@ -20,30 +20,47 @@
 class Sipgate_Frontend_Json extends Tinebase_Frontend_Json_Abstract
 {
 
-        /**
-         * app name
-         *
-         * @var string
-         */
-        protected $_applicationName = 'Sipgate';
+    /**
+     * the controller
+     *
+     * @var Sipgate_Controller_Line
+     */
+    protected $_controller = NULL;    
 
-        /**
-         * dial number
-         *
-         * @param  String $_number phone number
-         * @return Array
-         */
-        public function dialNumber($_number) {
-                $_number = 'sip:'.preg_replace('/\+/','',$_number).'@sipgate.net';
-                $resp = Sipgate_Controller::getInstance()->dialNumber($_number);
-                if($resp['StatusCode'] === 200) {
-                        $ret = array('success' => true,'state' => $resp);
-                }
-                else {
-                        $ret = array('error' => true,'response' => $resp);
-                }
-                return $ret;
-        }
+    /**
+     * app name
+     *
+     * @var string
+     */
+    protected $_applicationName = 'Sipgate';
+
+    
+    /**
+     * the constructor
+     *
+     */
+    public function __construct()
+    {
+        $this->_controller = Sipgate_Controller_Line::getInstance();
+    }        
+        
+    /**
+     * dial number
+     *
+     * @param  String $_number phone number
+     * @return Array
+     */
+    public function dialNumber($_number) {
+            $_number = 'sip:'.preg_replace('/\+/','',$_number).'@sipgate.net';
+            $resp = Sipgate_Controller::getInstance()->dialNumber($_number);
+            if($resp['StatusCode'] === 200) {
+                    $ret = array('success' => true,'state' => $resp);
+            }
+            else {
+                    $ret = array('error' => true,'response' => $resp);
+            }
+            return $ret;
+    }
 
         public function searchLines() {
 //            $be = new Sipgate_Backend_Line();
@@ -51,133 +68,141 @@ class Sipgate_Frontend_Json extends Tinebase_Frontend_Json_Abstract
             $filter = array();
             $paging = array();
 
-            return $this->_search($filter, $paging, Sipgate_Controller_Line::getInstance(), 'Sipgate_Model_LineFilter');
+            return $this->_search($filter, $paging, $this->_controller, 'Sipgate_Model_LineFilter');
 
 
 //            return array('success' => true, 'results' => $records->toArray());
         }
 
-        /**
-         *
-         * returns the Call History of the uri
-         * @param String $_sipUri
-         * @param Integer $_start
-         * @param Integer $_stop
-         * @param Integer $_pstart
-         * @param Integer $_plimit
-         */
+    /**
+     * Saves a Line Record
+     * @param unknown_type $recordData
+     */
+    public function saveLine($recordData) {
+        return $this->_save($recordData, $this->_controller, 'Line');        
+    }
+    
+    /**
+     *
+     * returns the Call History of the uri
+     * @param String $_sipUri
+     * @param Integer $_start
+     * @param Integer $_stop
+     * @param Integer $_pstart
+     * @param Integer $_plimit
+     */
 
-        public function getCallHistory($_sipUri, $_start, $_stop, $_pstart = 0, $_plimit = 20) {
+    public function getCallHistory($_sipUri, $_start, $_stop, $_pstart = 0, $_plimit = 20) {
 
-                if(empty($_sipUri)) throw new Sipgate_Exception('Sip-Uri leer!');
-                if($_sipUri == 'root') return array();
+            if(empty($_sipUri)) throw new Sipgate_Exception('Sip-Uri leer!');
+            if($_sipUri == 'root') return array();
 
-                // Kein Plan, wo die Vorwahlen herkommen:
-                $stripPrefix = array('sip:2300','sip:2301','sip:2400','sip:','@sipgate.net','anonymous');
-                $stripRepl = array('','','','','','');
+            // Kein Plan, wo die Vorwahlen herkommen:
+            $stripPrefix = array('sip:2300','sip:2301','sip:2400','sip:','@sipgate.net','anonymous');
+            $stripRepl = array('','','','','','');
 
-                $paging = array("start" => 0, "limit" => 1);
-                $ret = array();
-                $history = Sipgate_Controller::getInstance()->getCallHistory($_sipUri, $_start, $_stop, $_pstart, $_plimit);
-                if($history['totalcount'] > 0) {
-                        foreach($history['items'] as &$hEntry) {
-                                $rUri = str_replace($stripPrefix,$stripRepl,$hEntry['RemoteUri']);
-                                $hEntry['Timestamp'] = strtotime($hEntry['Timestamp']);
-                                $hEntry['LocalNumber'] = '+' . preg_replace('/\D*/i','',$hEntry['LocalUri']);
-                                $filter = array(array("field" => "telephone","operator" => "contains","value" => $rUri));
-                                $s = $this->_search($filter, $paging, Addressbook_Controller_Contact::getInstance(), 'Addressbook_Model_ContactFilter');
+            $paging = array("start" => 0, "limit" => 1);
+            $ret = array();
+            $history = Sipgate_Controller::getInstance()->getCallHistory($_sipUri, $_start, $_stop, $_pstart, $_plimit);
+            if($history['totalcount'] > 0) {
+                    foreach($history['items'] as &$hEntry) {
+                            $rUri = str_replace($stripPrefix,$stripRepl,$hEntry['RemoteUri']);
+                            $hEntry['Timestamp'] = strtotime($hEntry['Timestamp']);
+                            $hEntry['LocalNumber'] = '+' . preg_replace('/\D*/i','',$hEntry['LocalUri']);
+                            $filter = array(array("field" => "telephone","operator" => "contains","value" => $rUri));
+                            $s = $this->_search($filter, $paging, Addressbook_Controller_Contact::getInstance(), 'Addressbook_Model_ContactFilter');
 
-                                if($s['totalcount'] === '1') {
-                                        $hEntry['RemoteParty'] = $s['results'][0]['n_fn'] . ' ( +' . $rUri . ' )';
-                                        $hEntry['RemoteRecord'] = $s['results'][0];
-                                }
-                                else {
-                                        if(empty($rUri)) $hEntry['RemoteParty'] = 'unknown';
-                                        else $hEntry['RemoteParty'] = '+' . $rUri;
-                                        $hEntry['RemoteRecord'] = false;
-                                }
-                                if(empty($rUri)) $hEntry['RemoteNumber'] = 'unknown';
-                                else $hEntry['RemoteNumber'] = '+' . $rUri;
+                            if($s['totalcount'] === '1') {
+                                    $hEntry['RemoteParty'] = $s['results'][0]['n_fn'] . ' ( +' . $rUri . ' )';
+                                    $hEntry['RemoteRecord'] = $s['results'][0];
+                            }
+                            else {
+                                    if(empty($rUri)) $hEntry['RemoteParty'] = 'unknown';
+                                    else $hEntry['RemoteParty'] = '+' . $rUri;
+                                    $hEntry['RemoteRecord'] = false;
+                            }
+                            if(empty($rUri)) $hEntry['RemoteNumber'] = 'unknown';
+                            else $hEntry['RemoteNumber'] = '+' . $rUri;
 
-                        }
-                        $ret = &$history;
-
-
-
-                }
-
-                return $ret;
-        }
+                    }
+                    $ret = &$history;
 
 
-        /**
-         * send SMS
-         *
-         * @param  int    $_number  phone number
-         * @param  int    $_content the content
-         * @return array
-         */
-        public function sendSms($_number,$_content)        {
-                if(($resp = Sipgate_Controller::getInstance()->sendSms($_number,$_content))) {
-                    return array('success' => true,'response'  => $resp);
-                } else {
-                    return array('success' => false,'response'  => $resp);
-                }
-        }
 
-        /**
-         * @return array
-         */
-        public function getPhoneDevices() {
-                $phones = Sipgate_Controller::getInstance()->getPhoneDevices();
-                if($phones) {
-                        $ret = array('success' => true,'phones' => $phones);
-                }
-                else {
-                        $ret = array('success' => false);
-                }
-                return $ret;
+            }
 
-        }
-        /**
-         * @return array
-         */
-        public function getFaxDevices() {
-                $faxes = Sipgate_Controller::getInstance()->getFaxDevices();
-                if($faxes) {
-                        $ret = array('success' => true,'phones' => $faxes);
-                }
-                else {
-                        $ret = array('error' => true);
-                }
-                return $ret;
-        }
+            return $ret;
+    }
 
-        /**
-         * get Session Status
-         *
-         * @param  string $sessionId
-         * @return array
-         */
-        public function getSessionStatus($sessionId) {
-                if(empty($sessionId)) throw new Sipgate_Exception('No Session-Id in JSON-Frontend submitted!');
 
-                if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug('getting Status ' . $sessionId);
+    /**
+     * send SMS
+     *
+     * @param  int    $_number  phone number
+     * @param  int    $_content the content
+     * @return array
+     */
+    public function sendSms($_number,$_content)        {
+            if(($resp = Sipgate_Controller::getInstance()->sendSms($_number,$_content))) {
+                return array('success' => true,'response'  => $resp);
+            } else {
+                return array('success' => false,'response'  => $resp);
+            }
+    }
 
-                return Sipgate_Controller::getInstance()->getSessionStatus($sessionId);
-        }
+    /**
+     * @return array
+     */
+    public function getPhoneDevices() {
+            $phones = Sipgate_Controller::getInstance()->getPhoneDevices();
+            if($phones) {
+                    $ret = array('success' => true,'phones' => $phones);
+            }
+            else {
+                    $ret = array('success' => false);
+            }
+            return $ret;
 
-        /**
-         * close Session
-         *
-         * @param string $sessionId
-         * @return array
-         */
+    }
+    /**
+     * @return array
+     */
+    public function getFaxDevices() {
+            $faxes = Sipgate_Controller::getInstance()->getFaxDevices();
+            if($faxes) {
+                    $ret = array('success' => true,'phones' => $faxes);
+            }
+            else {
+                    $ret = array('error' => true);
+            }
+            return $ret;
+    }
 
-        public function closeSession($sessionId) {
-                if(empty($sessionId)) throw new Sipgate_Exception('No Session-Id in JSON-Frontend submitted!');
-                return Sipgate_Controller::getInstance()->closeSession($sessionId);
-        }
+    /**
+     * get Session Status
+     *
+     * @param  string $sessionId
+     * @return array
+     */
+    public function getSessionStatus($sessionId) {
+            if(empty($sessionId)) throw new Sipgate_Exception('No Session-Id in JSON-Frontend submitted!');
+
+            if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug('getting Status ' . $sessionId);
+
+            return Sipgate_Controller::getInstance()->getSessionStatus($sessionId);
+    }
+
+    /**
+     * close Session
+     *
+     * @param string $sessionId
+     * @return array
+     */
+
+    public function closeSession($sessionId) {
+            if(empty($sessionId)) throw new Sipgate_Exception('No Session-Id in JSON-Frontend submitted!');
+            return Sipgate_Controller::getInstance()->closeSession($sessionId);
+    }
 
     /**
      * Returns settings for sipgate app

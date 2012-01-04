@@ -42,6 +42,7 @@ Tine.Sipgate.AdminPanel = Ext.extend(Ext.FormPanel, {
     layout : 'fit',
     border : false,
     record: null,
+    accounts: null,
     cls : 'tw-editdialog',
     anchor : '100% 100%',
     deferredRender : false,
@@ -60,13 +61,25 @@ Tine.Sipgate.AdminPanel = Ext.extend(Ext.FormPanel, {
         // init buttons and tbar
         this.initButtons(); 
         
+        Tine.Admin.userBackend.load({sort: 'id', dir: 'ASC', start: 0, limit: 1000}, null, this.setAccounts, this);
+        
         this.loadRecord();
         this.items = this.getFormItems();
 
         Tine.Sipgate.AdminPanel.superclass.initComponent.call(this);
     },
     
-  
+    
+    setAccounts: function(_ret) {
+        var accounts = [];
+        
+        Ext.each(_ret.records, function(record) {
+            accounts.push([record.data.accountId, record.data.accountDisplayName]);
+        });
+        
+        this.accounts = accounts;
+        
+    },  
     
     initButtons: function() {
         this.fbar = [ '->', this.action_cancel, this.action_assign, this.action_ok, this.action_close ];
@@ -112,7 +125,7 @@ Tine.Sipgate.AdminPanel = Ext.extend(Ext.FormPanel, {
             text : this.app.i18n._('Assign Accounts'),
             minWidth : 70,
             scope : this,
-            disabled: true,
+//            disabled: true,
             handler : this.onAssignAccounts,
             iconCls : 'SipgateAssignUsers'
         });
@@ -135,7 +148,7 @@ Tine.Sipgate.AdminPanel = Ext.extend(Ext.FormPanel, {
     },
     
     onUpdate: function() {
-        Tine.log.debug(this.getForm().getValues());
+        
         if(this.validated) this.onCancel();
         else {
             this.messageBox = Ext.Msg.wait(this.app.i18n._('Validating Sipgate Configuration'),this.app.i18n._('Please Wait'))
@@ -160,7 +173,7 @@ Tine.Sipgate.AdminPanel = Ext.extend(Ext.FormPanel, {
                 },
                 success : function(_result, _request) {
                     this.record = Ext.decode(_result.responseText);
-                    Tine.log.debug(this.record);
+//                    Tine.log.debug(this.record);
 
                     if(this.record.username) {
                         this.getForm().findField('username').setValue(this.record.username);
@@ -184,7 +197,8 @@ Tine.Sipgate.AdminPanel = Ext.extend(Ext.FormPanel, {
     },
     
     onAssignAccounts: function() {
-        var win = Tine.Sipgate.AssignAccountsGrid.openWindow();
+        
+        var win = Tine.Sipgate.AssignAccountsGrid.openWindow({accounts: this.accounts});
         win.on('update', function() {
             win.onCancel();
             this.onCancel();
