@@ -24,6 +24,10 @@
           "path": "js/"
         },
         {
+          "text": "LineGridPanel.js",
+          "path": "js/"
+        }, 
+        {
           "text": "AdminPanel.js",
           "path": "js/"
         },

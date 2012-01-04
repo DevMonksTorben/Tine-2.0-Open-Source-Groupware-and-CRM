@@ -34,7 +34,7 @@ Tine.Sipgate.Model.Line = Tine.Tinebase.data.Record.create(Tine.Sipgate.Model.Li
 
 });
 
-Tine.Sipgate.lineBackend = new Tine.Tinebase.data.RecordProxy({
+Tine.Sipgate.recordBackend = new Tine.Tinebase.data.RecordProxy({
     appName: 'Sipgate',
     modelName: 'Line',
     recordClass: Tine.Sipgate.Model.Line
