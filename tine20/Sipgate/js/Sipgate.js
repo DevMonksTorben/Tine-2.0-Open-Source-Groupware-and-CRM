@@ -44,6 +44,21 @@ Tine.Sipgate.TreePanel = Ext.extend(Tine.widgets.container.TreePanel, {
     filterMode: 'filterToolbar',
     recordClass: Tine.Sipgate.Model.Line
 });
+
+/**
+ * @class       Tine.Sipgate.FilterPanel
+ * @extends     Tine.widgets.persistentfilter.PickerPanel
+ *  
+ * @param {Object} config
+ */
+Tine.Sipgate.FilterPanel = function(config) {
+    Ext.apply(this, config);
+    Tine.Sipgate.FilterPanel.superclass.constructor.call(this);
+};
+Ext.extend(Tine.Sipgate.FilterPanel, Tine.widgets.persistentfilter.PickerPanel, {
+    filter: [{field: 'model', operator: 'equals', value: 'Sipgate_Model_LineFilter'}]
+});
+
 //
 //Tine.Sipgate.getPanel = function() {
 //
