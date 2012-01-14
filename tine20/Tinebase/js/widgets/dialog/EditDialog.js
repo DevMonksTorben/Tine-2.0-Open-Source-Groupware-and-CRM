@@ -132,7 +132,7 @@ Tine.widgets.dialog.EditDialog = Ext.extend(Ext.FormPanel, {
     bufferResize: 500,
     
     //private
-    initComponent: function(){
+    initComponent: function() {
         try {
             this.addEvents(
                 /**
@@ -198,11 +198,10 @@ Tine.widgets.dialog.EditDialog = Ext.extend(Ext.FormPanel, {
                 });
             }
             
-            // init cf plugin
+            // init plugins
             this.plugins = this.plugins ? this.plugins : [];
             this.plugins.push(new Tine.widgets.customfields.EditDialogPlugin({}));
             this.plugins.push(this.tokenModePlugin = new Tine.widgets.dialog.TokenModeEditDialogPlugin({}));
-            this.plugins.push(new Tine.widgets.dialog.KeyShortcutsEditDialogPlugin({}));
             
             if(this.useMultiple) this.plugins.push(new Tine.widgets.dialog.MultipleEditDialogPlugin({}));
             
@@ -381,27 +380,31 @@ Tine.widgets.dialog.EditDialog = Ext.extend(Ext.FormPanel, {
             return;
         }
         
-        Tine.log.debug('loading of the following record completed:');
-        //without decode in FF: uncaught exception: TypeError: iter is undefined
-        Tine.log.debug(Ext.decode(this.record));
-        
-        if (this.copyRecord) {
-            this.doCopyRecord();
-            this.window.setTitle(String.format(_('Copy {0}'), this.i18nRecordName));
-        } else {
-            if (! this.record.id) {
-                this.window.setTitle(String.format(_('Add New {0}'), this.i18nRecordName));
-            } else {
-                this.window.setTitle(String.format(_('Edit {0} "{1}"'), this.i18nRecordName, this.record.getTitle()));
-            }
-        }
-        
-        if (this.fireEvent('load', this) !== false) {
-            this.getForm().loadRecord(this.record);
-            this.getForm().clearInvalid();
-            this.updateToolbars(this.record, this.recordClass.getMeta('containerProperty'));
+        try {
+            Tine.log.debug('loading of the following record completed:');
+            Tine.log.debug(this.record);
             
-            this.loadMask.hide();
+            if (this.copyRecord) {
+                this.doCopyRecord();
+                this.window.setTitle(String.format(_('Copy {0}'), this.i18nRecordName));
+            } else {
+                if (! this.record.id) {
+                    this.window.setTitle(String.format(_('Add New {0}'), this.i18nRecordName));
+                } else {
+                    this.window.setTitle(String.format(_('Edit {0} "{1}"'), this.i18nRecordName, this.record.getTitle()));
+                }
+            }
+            
+            if (this.fireEvent('load', this) !== false) {
+                this.getForm().loadRecord(this.record);
+                this.getForm().clearInvalid();
+                this.updateToolbars(this.record, this.recordClass.getMeta('containerProperty'));
+                
+                this.loadMask.hide();
+            }
+        } catch (e) {
+            Tine.log.error('Tine.widgets.dialog.EditDialog::onRecordLoad');
+            Tine.log.error(e.stack ? e.stack : e);
         }
     },
     
@@ -419,28 +422,35 @@ Tine.widgets.dialog.EditDialog = Ext.extend(Ext.FormPanel, {
      * @private
      */
     onRender : function(ct, position){
-        Tine.widgets.dialog.EditDialog.superclass.onRender.call(this, ct, position);
-        
-        // generalized keybord map for edit dlgs
-        var map = new Ext.KeyMap(this.el, [
-            {
-                key: [10,13], // ctrl + return
-                ctrl: true,
-                scope: this,
-                fn: function() {
-                    // focus ok btn
-                    this.action_saveAndClose.items[0].focus();
-                    this.onSaveAndClose.defer(10, this);
-                }
-            }
-        ]);
-
-        // should be fixed in WindowFactory
-        //this.setHeight(Ext.fly(this.el.dom.parentNode).getHeight());
+        try {
+            Tine.widgets.dialog.EditDialog.superclass.onRender.call(this, ct, position);
             
-        this.loadMask = new Ext.LoadMask(ct, {msg: String.format(_('Transferring {0}...'), this.i18nRecordName)});
-        if (this.mode !== 'local' && this.recordProxy !== null && this.recordProxy.isLoading(this.loadRequest)) {
-            this.loadMask.show();
+            // generalized keybord map for edit dlgs
+            var map = new Ext.KeyMap(this.el, [
+                {
+                    key: [10,13], // ctrl + return
+                    ctrl: true,
+                    scope: this,
+                    fn: function() {
+                        // focus ok btn
+                        if (this.action_saveAndClose.items) {
+                            this.action_saveAndClose.items[0].focus();
+                        }
+                        this.onSaveAndClose.defer(10, this);
+                    }
+                }
+            ]);
+    
+            // should be fixed in WindowFactory
+            //this.setHeight(Ext.fly(this.el.dom.parentNode).getHeight());
+                
+            this.loadMask = new Ext.LoadMask(ct, {msg: String.format(_('Transferring {0}...'), this.i18nRecordName)});
+            if (this.mode !== 'local' && this.recordProxy !== null && this.recordProxy.isLoading(this.loadRequest)) {
+                this.loadMask.show();
+            }
+        } catch (e) {
+            Tine.log.error('Tine.widgets.dialog.EditDialog::onRender');
+            Tine.log.error(e.stack ? e.stack : e);
         }
     },
     

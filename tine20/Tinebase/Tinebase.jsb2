@@ -52,6 +52,10 @@
           "path": "js/widgets/"
         },
         {
+          "text": "RecordPickerManager.js",
+          "path": "js/widgets/form/"
+        },
+        {
           "text": "FieldLabeler.js",
           "path": "js/ux/"
         },
@@ -150,11 +154,7 @@
         {
           "text": "Download.js",
           "path": "js/ux/file/"
-        },
-        {
-          "text": "MonthPickerPlugin.js",
-          "path": "js/ux/form/"
-        },        
+        },    
         {
           "text": "ColorField.js",
           "path": "js/ux/form/"
@@ -375,9 +375,13 @@
           "text": "MultipleEditDialogPlugin.js",
           "path": "js/widgets/dialog/"
         },
-         {
-          "text": "KeyShortcutsEditDialogPlugin.js",
+        {
+          "text": "MultipleEditResultSummary.js",
           "path": "js/widgets/dialog/"
+        },
+        {
+          "text": "TabPanelKeyPlugin.js",
+          "path": "js/ux/"
         },
         {
           "text": "TokenModeEditDialogPlugin.js",

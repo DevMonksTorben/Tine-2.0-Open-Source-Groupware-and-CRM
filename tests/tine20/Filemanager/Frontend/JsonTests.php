@@ -19,7 +19,7 @@ require_once dirname(dirname(dirname(__FILE__))) . DIRECTORY_SEPARATOR . 'TestHe
  * 
  * @package     Filemanager
  */
-class Filemanager_Frontend_JsonTest extends PHPUnit_Framework_TestCase
+class Filemanager_Frontend_JsonTests extends PHPUnit_Framework_TestCase
 {
     /**
      * @var array test objects
@@ -154,7 +154,7 @@ class Filemanager_Frontend_JsonTest extends PHPUnit_Framework_TestCase
         foreach ($testPaths as $path) {
             $path = Filemanager_Controller_Node::getInstance()->addBasePath($path);
             $this->_objects['paths'][] = $path;
-            $this->_fsController->mkDir($path);
+            $this->_fsController->mkdir($path);
         }
     }
 
@@ -169,7 +169,7 @@ class Filemanager_Frontend_JsonTest extends PHPUnit_Framework_TestCase
         if (isset($this->_objects['paths'])) {
             foreach ($this->_objects['paths'] as $path) {
                 try {
-                    $this->_fsController->rmDir($path, TRUE);
+                    $this->_fsController->rmdir($path, TRUE);
                 } catch (Tinebase_Exception_NotFound $tenf) {
                     // already deleted
                 }
@@ -223,9 +223,9 @@ class Filemanager_Frontend_JsonTest extends PHPUnit_Framework_TestCase
     protected function _searchHelper($_filter, $_expectedName, $_toplevel = FALSE, $_checkAccountGrants = TRUE)
     {
         $result = $this->_json->searchNodes($_filter, array('sort' => 'size'));
-        //print_r($result);
+        #print_r($result);
         
-        $this->assertEquals(1, $result['totalcount'], 'expected single result');
+        $this->assertGreaterThanOrEqual(1, $result['totalcount'], 'expected at least one entry');
         if ($_toplevel) {
             // toplevel containers are resolved
             $this->assertEquals($_expectedName, $result['results'][0]['name']['name']);
@@ -416,7 +416,7 @@ class Filemanager_Frontend_JsonTest extends PHPUnit_Framework_TestCase
         $tempFile = $tempFileBackend->createTempFile(dirname(dirname(__FILE__)) . '/files/test.txt');
         $result = $this->_json->createNode($filepath, Tinebase_Model_Tree_Node::TYPE_FILE, $tempFile->getId(), TRUE);
         
-        $this->assertEquals('text/plain', $result['contenttype']);
+        $this->assertEquals('text/plain', $result['contenttype'], print_r($result, TRUE));
         $this->assertEquals(17, $result['size']);
         
         return $result;
@@ -795,14 +795,22 @@ class Filemanager_Frontend_JsonTest extends PHPUnit_Framework_TestCase
      */
     public function testDeletedFileCleanup()
     {
+        // remove all files with size 0 first
+        $size0Nodes = Tinebase_FileSystem::getInstance()->searchNodes(new Tinebase_Model_Tree_Node_Filter(array(array(
+            'field' => 'size', 'operator' => 'equals', 'value' => 0
+        ))));
+        foreach ($size0Nodes as $node) {
+            Tinebase_FileSystem::getInstance()->deleteFileNode($node);
+        }
+        
         $this->testDeleteFileNodes();
         $result = Tinebase_FileSystem::getInstance()->clearDeletedFiles();
-        $this->assertGreaterThan(0, $result);
+        $this->assertGreaterThan(0, $result, 'should cleanup one file or more');
         $this->tearDown();
-
+        
         $this->testDeleteFileNodes();
         $result = Tinebase_FileSystem::getInstance()->clearDeletedFiles();
-        $this->assertEquals(1, $result);
+        $this->assertEquals(1, $result, 'should cleanup one file');
     }
 
     /**

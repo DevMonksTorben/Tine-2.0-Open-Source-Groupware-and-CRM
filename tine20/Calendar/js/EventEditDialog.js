@@ -55,6 +55,9 @@ Tine.Calendar.EventEditDialog = Ext.extend(Tine.widgets.dialog.EditDialog, {
         return {
             xtype: 'tabpanel',
             border: false,
+            plugins: [{
+                ptype : 'ux.tabpanelkeyplugin'
+            }],
             plain:true,
             activeTab: 0,
             border: false,
@@ -264,7 +267,7 @@ Tine.Calendar.EventEditDialog = Ext.extend(Tine.widgets.dialog.EditDialog, {
         
         return isValid && Tine.Calendar.EventEditDialog.superclass.isValid.apply(this, arguments);
     },
-    
+     
     onAllDayChange: function(checkbox, isChecked) {
         var dtStartField = this.getForm().findField('dtstart');
         var dtEndField = this.getForm().findField('dtend');
@@ -298,7 +301,7 @@ Tine.Calendar.EventEditDialog = Ext.extend(Tine.widgets.dialog.EditDialog, {
             }
         }
     },
-    
+ 
     onRecordLoad: function() {
         // NOTE: it comes again and again till 
         if (this.rendered) {
@@ -325,7 +328,7 @@ Tine.Calendar.EventEditDialog = Ext.extend(Tine.widgets.dialog.EditDialog, {
         this.attendeeGridPanel.onRecordUpdate(this.record);
         this.rrulePanel.onRecordUpdate(this.record);
         this.alarmPanel.onRecordUpdate(this.record);
-        this.CalendarSelectWidget.onRecordUpdate(this.record);
+        this.CalendarSelectWidget.onRecordUpdate(this.record);       
     },
     
     setTabHeight: function() {

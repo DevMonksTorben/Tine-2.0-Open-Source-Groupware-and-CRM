@@ -37,7 +37,11 @@ Tine.Calendar.SearchCombo = Ext.extend(Ext.form.ComboBox, {
     
     app: null,
     appName: 'Calendar',
-    
+
+    /**
+     * date filter from datepicker
+     */
+    addFilter: null,
     store: null,
     
     triggerAction: 'all',
@@ -84,17 +88,33 @@ Tine.Calendar.SearchCombo = Ext.extend(Ext.form.ComboBox, {
                 '<tpl for="."><div class="search-item">',
                     '<table cellspacing="0" cellpadding="2" border="0" style="font-size: 11px;" width="100%">',
                         '<tr>',
-                            '<td><b>{[this.encode(values.summary)]}</b></td>',
+                            '<td width="40%"><b>{[this.encode(values.summary)]}</b></td>',
+                            '<td width="60%">',
+                                '{[this.encodeDate(values)]}',
+                            '</td>',
+                            
                         '</tr>',
                     '</table>',
                 '</div></tpl>',
                 {
-                    encode: function(value) {                
+                    encode: function(value) {
+                        
                         if (value) {
                             return Ext.util.Format.htmlEncode(value);
                         } else {
                             return '';
                         }
+                    },
+                    encodeDate: function(values) {
+                        var start = values.dtstart;
+                            end   = values.dtend;
+
+                        var duration = values.is_all_day_event ? Tine.Tinebase.appMgr.get('Calendar').i18n._('whole day') : 
+                                       Tine.Tinebase.common.minutesRenderer(Math.round((end.getTime() - start.getTime())/(1000*60)), '{0}:{1}', 'i');
+                        
+                        var startYear = start.getYear() + 1900;
+                        return start.getDate() + '.' + (start.getMonth() + 1) + '.' + startYear + ' ' + duration;
+                        
                     }
                 }
             );
@@ -105,12 +125,14 @@ Tine.Calendar.SearchCombo = Ext.extend(Ext.form.ComboBox, {
      * sets the filter
      * @param {} filter
      */
-    setFilter: function(filter) {
-        this.store.baseParams.filter = [filter];
+    setFilter: function(filter) {      
+        this.addFilter = filter;
+        this.store.baseParams.filter = [this.addFilter];
         this.fireEvent('filterupdate');
     },
     
     onBeforeQuery: function (qevent) {
+        this.store.baseParams.filter = [this.addFilter];
         this.store.baseParams.filter.push({field: 'query', operator: 'contains', value: qevent.query });
     }
 

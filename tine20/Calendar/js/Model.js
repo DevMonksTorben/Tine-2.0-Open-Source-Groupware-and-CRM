@@ -3,7 +3,7 @@
  * 
  * @license     http://www.gnu.org/licenses/agpl.html AGPL Version 3
  * @author      Cornelius Weiss <c.weiss@metaways.de>
- * @copyright   Copyright (c) 2007-2011 Metaways Infosystems GmbH (http://www.metaways.de)
+ * @copyright   Copyright (c) 2007-2012 Metaways Infosystems GmbH (http://www.metaways.de)
  */
 
 Ext.ns('Tine.Calendar', 'Tine.Calendar.Model');
@@ -198,6 +198,9 @@ Tine.Calendar.Model.Event.getFilterModel = function() {
     
     return [
         {label: _('Quick search'), field: 'query', operators: ['contains']},
+        {label: app.i18n._('Summary'), field: 'summary'},
+        {label: app.i18n._('Location'), field: 'location'},
+        {label: app.i18n._('Description'), field: 'description'},
         {filtertype: 'tine.widget.container.filtermodel', app: app, recordClass: Tine.Calendar.Model.Event, /*defaultOperator: 'in',*/ defaultValue: {path: Tine.Tinebase.container.getMyNodePath()}},
         {filtertype: 'calendar.attendee'},
         {
@@ -513,14 +516,6 @@ Tine.Calendar.Model.Resource = Tine.Tinebase.data.Record.create(Tine.Tinebase.Mo
     containerProperty: null
 });
 
-/* lets try it with Ext.Direct
-Tine.Calendar.backend = new Tine.Calendar.Model.EventJsonBackend({
-    appName: 'Calendar',
-    modelName: 'Resource',
-    recordClass: Tine.Calendar.Model.Resource
-});
-*/
-
 /**
  * @namespace   Tine.Calendar.Model
  * @class       Tine.Calendar.Model.iMIP
@@ -534,6 +529,7 @@ Tine.Calendar.Model.iMIP = Tine.Tinebase.data.Record.create([
     {name: 'originator'},
     {name: 'userAgent'},
     {name: 'event'},
+    {name: 'existing_event'},
     {name: 'preconditions'}
 ], {
     appName: 'Calendar',

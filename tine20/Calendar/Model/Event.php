@@ -281,7 +281,8 @@ class Calendar_Model_Event extends Tinebase_Record_Abstract
         $hasGrant = array_key_exists($_grant, $this->_properties) && (bool)$this->{$_grant};
         
         if ($this->class !== Calendar_Model_Event::CLASS_PUBLIC) {
-            $hasGrant &= $this->{Tinebase_Model_Grants::GRANT_PRIVATE};
+            // || i'm attendee
+            $hasGrant &= $this->{Tinebase_Model_Grants::GRANT_PRIVATE} || Calendar_Model_Attender::getOwnAttender($this->attendee);
         }
         
         return $hasGrant;
@@ -315,6 +316,33 @@ class Calendar_Model_Event extends Tinebase_Record_Abstract
         $this->recurid = $this->uid . '-' . $dtstart->get(Tinebase_Record_Abstract::ISO8601LONG);
         
         return $this->recurid;
+    }
+    
+    /**
+     * sets rrule until helper field
+     *
+     * @return void
+     */
+    public function setRruleUntil()
+    {
+        if (empty($this->rrule)) {
+            $this->rrule_until = NULL;
+        } else {
+            $rrule = $this->rrule;
+            if (! $this->rrule instanceof Calendar_Model_Rrule) {
+                $rrule = new Calendar_Model_Rrule(array());
+                $rrule->setFromString($this->rrule);
+            }
+            
+            if (isset($rrule->count)) {
+                $this->rrule_until = NULL;
+                
+                $lastOccurrence = Calendar_Model_Rrule::computeNextOccurrence($this, new Tinebase_Record_RecordSet('Calendar_Model_Event'), $this->dtend, $rrule->count -1);
+                $this->rrule_until = $lastOccurrence->dtend;
+            } else {
+                $this->rrule_until = $rrule->until;
+            }
+        }
     }
     
     /**
@@ -451,6 +479,11 @@ class Calendar_Model_Event extends Tinebase_Record_Abstract
             || $this->rrule != $_event->rrule;
     }
     
+    /**
+     * sets and returns the addressbook entry of the organizer
+     * 
+     * @return Addressbook_Model_Contact
+     */
     public function resolveOrganizer()
     {
         if (! $this->organizer instanceof Addressbook_Model_Contact) {

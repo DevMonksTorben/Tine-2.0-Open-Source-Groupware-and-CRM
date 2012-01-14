@@ -5,7 +5,7 @@
  * @package     Calendar
  * @license     http://www.gnu.org/licenses/agpl.html AGPL Version 3
  * @author      Cornelius Weiss <c.weiss@metaways.de>
- * @copyright   Copyright (c) 2010-2011 Metaways Infosystems GmbH (http://www.metaways.de)
+ * @copyright   Copyright (c) 2010-2012 Metaways Infosystems GmbH (http://www.metaways.de)
  */
 
 /**
@@ -120,7 +120,7 @@ class Calendar_Controller_Event extends Tinebase_Controller_Record_Abstract impl
      * @return void
      * @throws Calendar_Exception_AttendeeBusy
      */
-    public function checkBusyConficts($_event)
+    public function checkBusyConflicts($_event)
     {
         $ignoreUIDs = !empty($_event->uid) ? array($_event->uid) : array();
         
@@ -176,12 +176,13 @@ class Calendar_Controller_Event extends Tinebase_Controller_Record_Abstract impl
             
             if ($_checkBusyConflicts) {
                 // ensure that all attendee are free
-                $this->checkBusyConficts($_record);
+                $this->checkBusyConflicts($_record);
             }
             
             $sendNotifications = $this->_sendNotifications;
             $this->_sendNotifications = FALSE;
-                
+            
+            $_record->setRruleUntil();
             $event = parent::create($_record);
             $this->_saveAttendee($_record);
             
@@ -442,10 +443,11 @@ class Calendar_Controller_Event extends Tinebase_Controller_Record_Abstract impl
                        ) {
                         
                         // ensure that all attendee are free
-                        $this->checkBusyConficts($_record);
+                        $this->checkBusyConflicts($_record);
                     }
                 }
                 
+                $_record->setRruleUntil();
                 parent::update($_record);
                 $this->_saveAttendee($_record, $_record->isRescheduled($event));
                 
@@ -524,7 +526,7 @@ class Calendar_Controller_Event extends Tinebase_Controller_Record_Abstract impl
                 $db = $this->_backend->getAdapter();
                 $transactionId = Tinebase_TransactionManager::getInstance()->startTransaction($db);
                 
-                // delete if delte grant is present
+                // delete if delete grant is present
                 if ($this->_doContainerACLChecks === FALSE || $record->hasGrant(Tinebase_Model_Grants::GRANT_DELETE)) {
                     // NOTE delete needs to update sequence otherwise iTIP based protocolls ignore the delete
                     $this->_touch($record);
@@ -543,13 +545,19 @@ class Calendar_Controller_Event extends Tinebase_Controller_Record_Abstract impl
                     }
                 }
                 
+                // increase display container content sequence for all attendee of deleted event
+                if ($record->attendee instanceof Tinebase_Record_RecordSet) {
+                    foreach ($record->attendee as $attender) {
+                        $this->_increaseDisplayContainerContentSequence($attender, $record->container_id);
+                    }
+                }
+                
                 Tinebase_TransactionManager::getInstance()->commitTransaction($transactionId);
             } catch (Exception $e) {
                 Tinebase_TransactionManager::getInstance()->rollBack();
                 throw $e;
             }
         }
-            
     }
     
     /**
@@ -927,43 +935,27 @@ class Calendar_Controller_Event extends Tinebase_Controller_Record_Abstract impl
             if (! empty($_record->rrule)) {
                 $diff = $_oldRecord->dtstart->diff($_record->dtstart);
                 
-                // update rrule->until
-                if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' dtstart of a series changed -> adopting rrule_until');
-                
-                
-                $rrule = $_record->rrule instanceof Calendar_Model_Rrule ? $_record->rrule : Calendar_Model_Rrule::getRruleFromString($_record->rrule);
-                if ($rrule->until instanceof DateTime) {
-                    Calendar_Model_Rrule::addUTCDateDstFix($rrule->until, $diff, $_record->originator_tz);
-                    $_record->rrule = (string) $rrule;
-                }
-                
-                // update exdate(s)
-                if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' dtstart of a series changed -> adopting '. count($_record->exdate) . ' exdate(s)');
-                
-                foreach ((array)$_record->exdate as $exdate) {
-                    Calendar_Model_Rrule::addUTCDateDstFix($exdate, $diff, $_record->originator_tz);
-                }
-                
                 // update exceptions
-                $exceptions = $this->_backend->getMultipleByProperty($_record->uid, 'uid');
-                unset($exceptions[$exceptions->getIndexById($_record->getId())]);
+                $exceptions = $this->getRecurExceptions($_record);
                 if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' dtstart of a series changed -> adopting '. count($exceptions) . ' recurid(s)');
+                $exdates = array();
                 foreach ($exceptions as $exception) {
-                    $originalDtstart = new Tinebase_DateTime(substr($exception->recurid, -19));
-                    Calendar_Model_Rrule::addUTCDateDstFix($originalDtstart, $diff, $_record->originator_tz);
+                    $exception->recurid = new Tinebase_DateTime(substr($exception->recurid, -19));
+                    Calendar_Model_Rrule::addUTCDateDstFix($exception->recurid, $diff, $_record->originator_tz);
+                    $exdates[] = $exception->recurid;
                     
                     $exception->setRecurId();
                     $this->_backend->update($exception);
                 }
+                
+                $_record->exdate = $exdates;
             }
         }
         
         // delete recur exceptions if update is not longer a recur series
         if (! empty($_oldRecord->rrule) && empty($_record->rrule)) {
             if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' deleteing recur exceptions as event is no longer a recur series');
-            $exceptionIds = $this->_backend->getMultipleByProperty($_record->uid, 'uid')->getId();
-            unset($exceptionIds[array_search($_record->getId(), $exceptionIds)]);
-            $this->_backend->delete($exceptionIds);
+            $this->_backend->delete($this->getRecurExceptions($_record));
         }
         
         // touch base event of a recur series if an persisten exception changes
@@ -987,7 +979,7 @@ class Calendar_Controller_Event extends Tinebase_Controller_Record_Abstract impl
             
             // implicitly delete persistent recur instances of series
             if (! empty($event->rrule)) {
-                $exceptionIds = $this->_backend->getMultipleByProperty($event->uid, 'uid')->getId();
+                $exceptionIds = $this->getRecurExceptions($event)->getId();
                 if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' Implicitly deleting ' . (count($exceptionIds) - 1 ) . ' persistent exception(s) for recurring series with uid' . $event->uid);
                 $_ids = array_merge($_ids, $exceptionIds);
             }
@@ -1317,34 +1309,38 @@ class Calendar_Controller_Event extends Tinebase_Controller_Record_Abstract impl
      * @param Calendar_Model_Event $_event
      * @param bool                 $_isRescheduled event got rescheduled reset all attendee status
      */
-    protected function _saveAttendee($_event, $_isRescheduled=FALSE)
+    protected function _saveAttendee($_event, $_isRescheduled = FALSE)
     {
-        $attendee = $_event->attendee instanceof Tinebase_Record_RecordSet ? 
-            $_event->attendee : 
-            new Tinebase_Record_RecordSet('Calendar_Model_Attender');
-        $attendee->cal_event_id = $_event->getId();
+        if (! $_event->attendee instanceof Tinebase_Record_RecordSet) {
+            $_event->attendee = new Tinebase_Record_RecordSet('Calendar_Model_Attender');
+        }
+        
+        Calendar_Model_Attender::resolveEmailOnlyAttendee($_event);
+        
+        $_event->attendee->cal_event_id = $_event->getId();
         
         Tinebase_Core::getLogger()->info(__METHOD__ . '::' . __LINE__ . " About to save attendee for event {$_event->id} ");
         
         $currentEvent = $this->get($_event->getId());
         $currentAttendee = $currentEvent->attendee;
         
-        $diff = $currentAttendee->getMigration($attendee->getArrayOfIds());
+        $diff = $currentAttendee->getMigration($_event->attendee->getArrayOfIds());
         $this->_backend->deleteAttendee($diff['toDeleteIds']);
         
         $calendar = Tinebase_Container::getInstance()->getContainerById($_event->container_id);
         
-        foreach ($attendee as $attender) {
+        foreach ($_event->attendee as $attender) {
             $attenderId = $attender->getId();
             $idx = ($attenderId) ? $currentAttendee->getIndexById($attenderId) : FALSE;
             
             if ($idx !== FALSE) {
                 $currentAttender = $currentAttendee[$idx];
                 $this->_updateAttender($attender, $currentAttender, $calendar, $_isRescheduled);
-                
             } else {
                 $this->_createAttender($attender, $calendar);
             }
+            
+            $this->_increaseDisplayContainerContentSequence($attender, $calendar->getId());
         }
     }
 
@@ -1391,6 +1387,22 @@ class Calendar_Controller_Event extends Tinebase_Controller_Record_Abstract impl
             $_attender->displaycontainer_id = $resource->container_id;
         }
         $this->_backend->createAttendee($_attender);
+    }
+    
+    /**
+     * increases content sequence of attender display container
+     * 
+     * @param Calendar_Model_Attender $_attender
+     * @param integer $_eventContainerId
+     */
+    protected function _increaseDisplayContainerContentSequence($_attender, $_eventContainerId)
+    {
+        if ($_eventContainerId === $_attender->displaycontainer_id || empty($_attender->displaycontainer_id)) {
+            // no need to increase sequence
+            return; 
+        }
+        
+        Tinebase_Container::getInstance()->increaseContentSequence($_attender->displaycontainer_id);        
     }
     
     /**
