@@ -76,7 +76,7 @@ class Sipgate_Frontend_Json extends Tinebase_Frontend_Json_Abstract
 
     /**
      * Saves a Line Record
-     * @param unknown_type $recordData
+     * @param Array $recordData the line which should be saved
      */
     public function saveLine($recordData) {
         return $this->_save($recordData, $this->_controller, 'Line');        

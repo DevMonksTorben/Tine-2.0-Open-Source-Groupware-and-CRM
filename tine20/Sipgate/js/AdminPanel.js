@@ -62,9 +62,10 @@ Tine.Sipgate.AdminPanel = Ext.extend(Ext.FormPanel, {
         this.initButtons(); 
         
         Tine.Admin.userBackend.load({sort: 'id', dir: 'ASC', start: 0, limit: 1000}, null, this.setAccounts, this);
+        this.items = this.getFormItems();
         
         this.loadRecord();
-        this.items = this.getFormItems();
+        
 
         Tine.Sipgate.AdminPanel.superclass.initComponent.call(this);
     },
@@ -92,7 +93,7 @@ Tine.Sipgate.AdminPanel = Ext.extend(Ext.FormPanel, {
         Tine.widgets.dialog.EditDialog.superclass.onRender.call(this, ct, position);
 
         // generalized keybord map for edit dlgs
-        var map = new Ext.KeyMap(this.el, [ {
+        new Ext.KeyMap(this.el, [ {
             key : [ 10, 13 ], // ctrl + return
             ctrl : true,
             fn : this.onUpdate,
@@ -125,7 +126,7 @@ Tine.Sipgate.AdminPanel = Ext.extend(Ext.FormPanel, {
             text : this.app.i18n._('Assign Accounts'),
             minWidth : 70,
             scope : this,
-//            disabled: true,
+            disabled: true,
             handler : this.onAssignAccounts,
             iconCls : 'SipgateAssignUsers'
         });
@@ -159,7 +160,7 @@ Tine.Sipgate.AdminPanel = Ext.extend(Ext.FormPanel, {
     },
     
     loadRecord: function() {
-        
+
         if (! this.rendered) {
             this.loadRecord.defer(250, this);
             return;
@@ -172,18 +173,15 @@ Tine.Sipgate.AdminPanel = Ext.extend(Ext.FormPanel, {
                     method : 'Sipgate.getConfigSettings'
                 },
                 success : function(_result, _request) {
-                    this.record = Ext.decode(_result.responseText);
-//                    Tine.log.debug(this.record);
-
-                    if(this.record.username) {
-                        this.getForm().findField('username').setValue(this.record.username);
-                        this.getForm().findField('password').setValue(this.record.password);
-                    
-                        if(this.record.accounttype == 'plus') {
-                            this.getForm().findField('plus').setValue(true);
-                        } else {
-                            this.getForm().findField('team').setValue(true);
-                        }
+                    try {
+                        this.record = Ext.decode(_result.responseText);   
+                        this.usernameField.setValue(this.record.username);
+                        this.passwordField.setValue(this.record.password);
+                        this.accounttypeField.setValue(this.record.accounttype);
+                        
+                    } catch (e) {
+                        Tine.log.error('Tine.Sipgate.AdminPanel::loadRecord::successCallback');
+                        Tine.log.error(e.stack ? e.stack : e);
                     }
                     this.loadMask.hide();
                 }
@@ -197,7 +195,6 @@ Tine.Sipgate.AdminPanel = Ext.extend(Ext.FormPanel, {
     },
     
     onAssignAccounts: function() {
-        
         var win = Tine.Sipgate.AssignAccountsGrid.openWindow({accounts: this.accounts});
         win.on('update', function() {
             win.onCancel();
@@ -206,6 +203,7 @@ Tine.Sipgate.AdminPanel = Ext.extend(Ext.FormPanel, {
     },
     
     saveSettings: function() {
+        
         Ext.Ajax.request({
                 url : 'index.php',
                 scope: this,
@@ -233,8 +231,7 @@ Tine.Sipgate.AdminPanel = Ext.extend(Ext.FormPanel, {
     },
        
     getFormItems : function() {
-
-
+   
         return {
             border : false,
             frame : true,
@@ -243,13 +240,15 @@ Tine.Sipgate.AdminPanel = Ext.extend(Ext.FormPanel, {
                 xtype: 'fieldset',
                 region: 'north',
                 padding: 5,
-                 layout: 'form',
-                 height: 100,
+                layout: 'form',
+                height: 100,
                 title: this.app.i18n._('Credentials'),
                 items: [{
                         fieldLabel: this.app.i18n._('Username'),
                         xtype: 'textfield',
                         name: 'username',
+                        ref: '../../usernameField',
+                        value: '',
                         listeners: {
                             scope: this,
                             change: function() { this.validated = false; this.action_assign.disable();}
@@ -259,6 +258,8 @@ Tine.Sipgate.AdminPanel = Ext.extend(Ext.FormPanel, {
                         xtype: 'textfield',
                         inputType: 'password',
                         name: 'password',
+                        value: '',
+                        ref: '../../passwordField',
                         listeners: {
                             scope: this,
                             change: function() { this.validated = false; this.action_assign.disable();}
@@ -268,35 +269,35 @@ Tine.Sipgate.AdminPanel = Ext.extend(Ext.FormPanel, {
                 xtype: 'fieldset',
                 region: 'center',
                 padding: 5,
-                 layout: 'form',
+                layout: 'form',
                 title: this.app.i18n._('Account Settings'),
-                items: [{ 
-                  boxLabel: this.app.i18n._('Plus'), 
-                  name: 'plus',
-                  xtype: 'checkbox',
-                  bubbleEvents: ['check'],
-                  listeners: {
-                      scope: this, 
-                      check: function() {
-                          this.getForm().findField('team').setValue(false);
-                          this.validated = false;
-                          this.action_assign.disable();
-                      }
-                  }
-                }, { 
-                    boxLabel: this.app.i18n._('Team'), 
-                    name: 'team',
-                    xtype: 'checkbox',
-                    bubbleEvents: ['check'],
-                    listeners: {
-                        scope: this, 
-                        check: function() {                    
-                            this.getForm().findField('plus').setValue(false);
-                            this.validated = false;
-                            this.action_assign.disable();
-                        }
+                items: [
+                    {
+                        xtype: 'radiogroup',
+                        hideLabel: true,
+                        ref: '../../accounttypeField',
+                        itemCls: 'x-check-group-alt',
+                        columns: 1,
+                        name: 'optionGroup',
+                        items: [
+                            {
+                                checked: false,
+                                fieldLabel: '',
+                                labelSeparator: '',
+                                boxLabel: this.app.i18n._('Plus'),
+                                name: 'accounttype',
+                                inputValue: 'plus'
+                            }, {
+                                checked: false,
+                                fieldLabel: '',
+                                labelSeparator: '',
+                                boxLabel: this.app.i18n._('Team'),
+                                name: 'accounttype',
+                                inputValue: 'team'
+                            }
+                        ]
                     }
-                }]
+                ]
             }
         ]};
     }

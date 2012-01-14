@@ -30,34 +30,68 @@ Tine.Sipgate.AssignAccountsGrid = Ext.extend(Ext.grid.EditorGridPanel, {
     appName : 'Sipgate',
     loadMask : true,
     store: null,
+    accountStore: null,
     cm: null,
     
     defaultSortInfo: {field: 'id', direction: 'ASC'},    
     
     recordClass: Tine.Sipgate.Model.Line,
-    app:null,
+    app: null,
     
     initComponent: function() {
         if (!this.app) {
             this.app = Tine.Tinebase.appMgr.get(this.appName);
         }  
         
-        
-        this.title = this.app.i18n._('Select the Account in this window. Selecting saves the definition, so no \'OK\'-button is needed.');
+        this.title = this.app.i18n._('Select the Account in this window. Changing the account saves the assignment, so no \'OK\'-button is needed.');
         
         this.recordProxy = Tine.Sipgate.lineBackend;
         this.initStore();
+        this.initActions();
+        this.initButtons();
+        
         this.cm = this.getColumnModel();
 
+        this.on('afteredit', function() { this.store.reload(); }, this);
+        
         Tine.Sipgate.AssignAccountsGrid.superclass.initComponent.call(this);
     },
-     
+    
+    initActions : function() {
+        this.action_ok = new Ext.Action({
+            text : this.app.i18n._('OK'),
+            minWidth : 70,
+            scope : this,
+            handler : this.onClose,
+            iconCls : 'action_saveAndClose'
+        });
+    },
+    
+    initButtons: function() {
+        this.fbar = [ '->', this.action_ok];
+    },
+    
+    onClose: function() {
+        this.fireEvent('cancel');
+        this.purgeListeners();
+        this.window.close();
+    },
+    
     initStore: function() {
         this.store = new Tine.Tinebase.data.RecordStore({
             recordClass: this.recordClass
         });
         this.store.load();
-     
+        
+        this.accounts = Ext.decode(this.accounts);
+        this.accountStore = new Ext.data.ArrayStore({
+            id: 0,
+            fields: [
+                'myId',
+                'displayText'
+            ],
+            data: this.accounts
+        });     
     },
 
     
@@ -69,8 +103,6 @@ Tine.Sipgate.AssignAccountsGrid = Ext.extend(Ext.grid.EditorGridPanel, {
      * @private
      */
     getColumnModel: function() {
-        var accounts = Ext.decode(this.accounts);
-
         return new Ext.grid.ColumnModel({
             defaults: {
                 sortable: false,
@@ -95,25 +127,24 @@ Tine.Sipgate.AssignAccountsGrid = Ext.extend(Ext.grid.EditorGridPanel, {
                 },
                 
                 { id: 'id', header: this.app.i18n._('Id'), dataIndex: 'id', hidden: true },
-                { id: 'account_id', header: this.app.i18n._('User Account'), dataIndex: 'account_id', 
-                    renderer      : function(e,f,g,h) { return accounts[h][1]},
+                { id: 'account_id', header: this.app.i18n._('User Account'), dataIndex: 'account_id',
+                    renderer: {
+                        scope: this,
+                        fn: function(e,f,g,h) { 
+                            var account = this.accountStore.getById(e);
+                            return account.data.displayText;
+                        }
+                    },
                     editor: new Ext.form.ComboBox({
                         mode: 'local',
                         forceSelection: true,    
                         blurOnSelect  : true,
                         expandOnFocus : true,
-                        store: new Ext.data.ArrayStore({
-                            id: 0,
-                            fields: [
-                                'myId',
-                                'displayText'
-                            ],
-                            data: accounts
-                        }),
+                        store: this.accountStore,
                         valueField: 'myId',
                         displayField: 'displayText',
                         triggerAction: 'all'
-                    }) 
+                    })
                 },
                 { id: 'uri_alias', header: this.app.i18n._('Uri Alias'), dataIndex: 'uri_alias' },
                 { id: 'sip_uri', header: this.app.i18n._('Sip Uri'), dataIndex: 'sip_uri' },
@@ -124,7 +155,7 @@ Tine.Sipgate.AssignAccountsGrid = Ext.extend(Ext.grid.EditorGridPanel, {
                         var esText = '<dl>';
                         Ext.each(es, function(e){
                             esText += '<dt>' + e + '</dt>';
-                            })
+                            });
                         esText += '</dl>';
                         return esText;
                     }

@@ -264,8 +264,7 @@ class Sipgate_Controller extends Tinebase_Controller_Abstract
             $_values['password'] = $cc->password;
         }
 
-        if ($_values['plus']) $values['accounttype'] = 'plus';
-        else $values['accounttype'] = 'team';
+        $values['accounttype'] = $_values['accounttype']; 
 
         if ($_values['password'] && $_values['username']) {
             $cc = Tinebase_Auth_CredentialCache::getInstance()->cacheCredentials($_values['username'], $_values['password'], 'sipgate_credential_cache');
