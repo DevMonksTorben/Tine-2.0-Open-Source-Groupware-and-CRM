@@ -217,11 +217,16 @@ Tine.Tinebase.MainScreen = Ext.extend(Ext.Panel, {
      * @param {Bool} keep keep panel
      */
     setActiveContentPanel: function(panel, keep) {
-        var cardPanel = Ext.getCmp('center-panel');
-        panel.keep = keep;
-        
-        this.cleanupCardPanelItems(cardPanel);
-        this.setActiveCardPanelItem(cardPanel, panel);
+        try {
+            var cardPanel = Ext.getCmp('center-panel');
+            panel.keep = keep;
+            
+            this.cleanupCardPanelItems(cardPanel);
+            this.setActiveCardPanelItem(cardPanel, panel);
+        } catch (e) {
+            Tine.log.err('Could not set active content panel');
+            Tine.log.err(e);
+        }
     },
     
     /**

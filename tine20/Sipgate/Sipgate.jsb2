@@ -24,7 +24,11 @@
           "path": "js/"
         },
         {
-          "text": "LineGridPanel.js",
+          "text": "ConnectionGridPanel.js",
+          "path": "js/"
+        },
+        {
+          "text": "LineTreePanel.js",
           "path": "js/"
         }, 
         {

@@ -141,6 +141,11 @@ Ext.extend(Tine.widgets.mainscreen.WestPanel, Ext.ux.Portal, {
      */
     getContainerTreePanel: function() {
         if (this.hasContainerTreePanel && !this.containerTreePanel) {
+            
+            Tine.log.err('ALEX APPNAME',this.app.appName);
+            Tine.log.err('ALEX tpcn',this.containerTreePanelClassName);
+            
+            
             this.containerTreePanel = new Tine[this.app.appName][this.containerTreePanelClassName]({app: this.app});
             
             this.containerTreePanel.on('click', function (node, event) {

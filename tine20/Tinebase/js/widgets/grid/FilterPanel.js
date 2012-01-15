@@ -9,7 +9,7 @@ Ext.ns('Tine.widgets.grid');
 
 Tine.widgets.grid.FilterPanel = function(config) {
     this.filterToolbarConfig = config;
-    
+
     // @TODO find quickfilter plungin an pick quickFilterField and criteriaIgnores from it
     this.criteriaIgnores = config.criteriaIgnores || [
         {field: 'container_id', operator: 'equals', value: {path: '/'}},

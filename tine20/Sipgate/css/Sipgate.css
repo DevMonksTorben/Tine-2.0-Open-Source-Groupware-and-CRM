@@ -13,7 +13,7 @@
 .x-btn-large .SipgateIconCls {background-image:url("../../images/oxygen/32x32/apps/kcall.png") !important;}
 
 .SipgateTreeNode_fax {background-image:url("../../images/../Sipgate/res/16x16/kfax.png") !important; height: 16px; width: 16px}
-.SipgateTreeNode_phone {background-image:url("../../images/oxygen/16x16/apps/kcall.png") !important; height: 16px; width: 16px}
+.SipgateTreeNode_voice {background-image:url("../../images/oxygen/16x16/apps/kcall.png") !important; height: 16px; width: 16px}
 
 
 .SipgateCallStatePhone {background-image:url("../../images/../Sipgate/res/phone-connecting.png") !important;margin:13px}

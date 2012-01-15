@@ -119,11 +119,8 @@ Ext.extend(Tine.widgets.MainScreen, Ext.util.Observable, {
      */
     getNorthPanel: function(contentType) {
         contentType = contentType || this.getActiveContentType();
-        Tine.log.err('ALEX',contentType);
-        Tine.log.err('ALEX',this.centerPanelClassNameSuffix);
-        Tine.log.err('ALEX', this[contentType + this.centerPanelClassNameSuffix]);
         if (! this[contentType + 'ActionToolbar']) {
-            try {
+            try { 
                 this[contentType + 'ActionToolbar'] = this[contentType + this.centerPanelClassNameSuffix].getActionToolbar();
             } catch (e) {
                 Tine.log.err('Could not create northPanel');

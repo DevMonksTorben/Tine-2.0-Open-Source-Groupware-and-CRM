@@ -8,13 +8,13 @@
 Ext.ns('Tine.Sipgate');
 
 /**
- * Line grid panel
+ * Connection grid panel
  * 
  * @namespace   Tine.Sipgate
- * @class       Tine.Sipgate.LineGridPanel
+ * @class       Tine.Sipgate.ConnectionGridPanel
  * @extends     Tine.widgets.grid.GridPanel
  * 
- * <p>Line Grid Panel</p>
+ * <p>Connection Grid Panel</p>
  * <p><pre>
  * </pre></p>
  * 
@@ -23,27 +23,27 @@ Ext.ns('Tine.Sipgate');
  * 
  * @param       {Object} config
  * @constructor
- * Create a new Tine.Sipgate.LineGridPanel
+ * Create a new Tine.Sipgate.ConnectionGridPanel
  */
-Tine.Sipgate.LineGridPanel = Ext.extend(Tine.widgets.grid.GridPanel, {
+Tine.Sipgate.ConnectionGridPanel = Ext.extend(Ext.grid.GridPanel, {
     /**
      * record class
-     * @cfg {Tine.Sipgate.Model.Line} recordClass
+     * @cfg {Tine.Sipgate.Model.Connection} recordClass
      */
-    recordClass: Tine.Sipgate.Model.Line,
+    recordClass: Tine.Sipgate.Model.Connection,
     
     /**
      * eval grants
      * @cfg {Boolean} evalGrants
      */
     evalGrants: true,
-    
+       
     /**
      * optional additional filterToolbar configs
      * @cfg {Object} ftbConfig
      */
     ftbConfig: null,
-    
+    border: false,
     /**
      * grid specific
      * @private
@@ -53,21 +53,101 @@ Tine.Sipgate.LineGridPanel = Ext.extend(Tine.widgets.grid.GridPanel, {
         autoExpandColumn: 'title'
     },
      
+    handlers: {},
+    actions: {},
     /**
      * inits this cmp
      * @private
      */
     initComponent: function() {
-        this.recordProxy = Tine.Sipgate.recordBackend;
-        
-        this.gridConfig.cm = this.getColumnModel();
-        this.filterToolbar = this.filterToolbar || this.getFilterToolbar(this.ftbConfig);
-        
-        this.plugins = this.plugins || [];
-        this.plugins.push(this.filterToolbar);
-        
-        Tine.Sipgate.LineGridPanel.superclass.initComponent.call(this);
+        this.recordProxy = Tine.Sipgate.connectionBackend;
+
+        this.cm = this.getColumnModel();
+        this.tbar = this.getPagingToolbar();
+        Tine.Sipgate.ConnectionGridPanel.superclass.initComponent.call(this);
     },
+    
+    getPagingToolbar: function() {
+        try {
+            var fromdate = new Ext.form.DateField({
+                format : 'D, d. M. Y',
+                value : new Date(new Date().getTime() - (24 * 60 * 60 * 1000)),
+                fieldLabel : this.app.i18n._('Calls from'),
+                id : 'startdt',
+                name : 'startdt',
+                width : 140,
+                allowBlank : false,
+                endDateField : 'enddt'
+            });
+
+            var todate = new Ext.form.DateField({
+                format : 'D, d. M. Y',
+                fieldLabel : this.app.i18n._('Calls to'),
+                value : new Date(),
+                maxValue : new Date(),
+                id : 'enddt',
+                name : 'enddt',
+                width : 140,
+                allowBlank : false,
+                startDateField : 'startdt'
+            });
+
+            return new Ext.PagingToolbar({
+//                items: [ fromdate, todate ],
+                prependButtons: true,
+    
+                        pageSize : 20,
+//                        store : this.store,
+                        displayInfo : true,
+                        displayMsg : this.app.i18n._('Displaying calls {0} - {1} of {2}'),
+                        emptyMsg : this.app.i18n._("No calls to display")
+            });
+        } catch (e) {
+            Tine.log.err('Could not create pagingToolbar');
+            Tine.log.err(e.stack ? e.stack : e);
+            return new Ext.Panel({html: 'Error creating pagingToolbar'});
+        }
+    },
+    
+//    getFilterToolbar: function(config) {
+//        return new Ext.Panel({html: 'MERKEL'});
+//    },
+//            
+//    getActionToolbar: function() {
+//return new Ext.Panel({html: 'MERKEL'});
+//    },
+//        this.handlers.addNumber = function() { alert('ASD'); };
+//        this.handlers.dialNumber = function() { alert('ASD'); };
+//        
+//        this.actions.dialNumber = new Ext.Action({
+//            text : this.app.i18n._('Dial number'),
+//            tooltip : this.app.i18n._('Initiates a new outgoing call'),
+//            handler : this.handlers.dialNumber,
+//            iconCls : 'action_DialNumber',
+//            scope : this
+//        });
+//
+//        this.actions.addNumber = new Ext.Action({
+//            text : this.app.i18n._('Add Number to Addressbook'),
+//            tooltip : this.app.i18n._('Adds this number to the Addressbook'),
+//            handler : this.handlers.addNumber,
+//            iconCls : 'action_AddNumber',
+//            scope : this
+//        });
+//        
+//        return new Ext.Toolbar({
+//            items : [{
+//                xtype : 'buttongroup',
+//                columns : 1,
+//                items : [Ext.apply(
+//                        new Ext.Button(this.actions.dialNumber), {
+//                            scale : 'medium',
+//                            rowspan : 2,
+//                            iconAlign : 'top'
+//                        })]
+//            }, '->']
+//        });
+//    },
     
     /**
      * returns cm
@@ -83,39 +163,37 @@ Tine.Sipgate.LineGridPanel = Ext.extend(Tine.widgets.grid.GridPanel, {
                     },
                     columns : [{
                         id : 'Status',
-                        header : this.translation._('Status'),
+                        header : this.app.i18n._('Status'),
                         dataIndex : 'Status',
                         width : 20,
-                        renderer: function(el){ 
+                        renderer: function(el) { 
                             return '<div class="SipgateCallStateList ' + el + '"></div>';
                         } 
-                        
-                            // renderer : this.renderer.direction
-                        }, {
+                    }, {
                         id : 'RemoteParty',
-                        header : this.translation._('Remote Party'),
+                        header : this.app.i18n._('Remote Party'),
                         dataIndex : 'RemoteParty',
                         hidden : false
                     }, {
                         id : 'RemoteNumber',
-                        header : this.translation._('Remote Number'),
+                        header : this.app.i18n._('Remote Number'),
                         dataIndex : 'RemoteNumber',
                         hidden : false
                     }, {
                         id : 'LocalUri',
-                        header : this.translation._('Local Uri'),
+                        header : this.app.i18n._('Local Uri'),
                         dataIndex : 'LocalUri',
                         hidden : true
                     }, {
                         id : 'RemoteUri',
-                        header : this.translation._('Remote Uri'),
+                        header : this.app.i18n._('Remote Uri'),
                         dataIndex : 'RemoteUri',
                         hidden : true
                             // renderer :
                             // this.renderer.destination'RemoteParty','RemoteRecord','RemoteNumber'
                         }, {
                         id : 'Timestamp',
-                        header : this.translation._('Call started'),
+                        header : this.app.i18n._('Call started'),
                         dataIndex : 'Timestamp',
                         renderer: function(tstamp) {
                             var d = new Date(tstamp*1000);                            
@@ -125,7 +203,7 @@ Tine.Sipgate.LineGridPanel = Ext.extend(Tine.widgets.grid.GridPanel, {
                         hidden:false
                         }, {
                         id : 'EntryID',
-                        header : this.translation._('Call ID'),
+                        header : this.app.i18n._('Call ID'),
                         dataIndex : 'EntryID',
                         hidden : true
                     }]

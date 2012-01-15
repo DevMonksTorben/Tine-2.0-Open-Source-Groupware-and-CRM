@@ -12,141 +12,114 @@
 
 Ext.ns('Tine.Sipgate');
 
-var CallUpdateWindowTask;
-var CallingState = false;
-
 Tine.Sipgate.Application = Ext.extend(Tine.Tinebase.Application, {
+    
+    appName: 'Sipgate',
+    
     getTitle: function() {
         return this.i18n.gettext('Sipgate');
+    },
+    
+    init: function() {
+        new Tine.Sipgate.AddressbookGridPanelHook({app: this});
     }
 });
 
 /**
- * @namespace   Tine.Projects
- * @class       Tine.Projects.MainScreen
+ * @namespace   Tine.Sipgate
+ * @class       Tine.Sipgate.MainScreen
  * @extends     Tine.widgets.MainScreen
  * 
  * @author      Alexander Stintzing <alex@stintzing.net>
  */
-Tine.Sipgate.MainScreen = Ext.extend(Tine.widgets.MainScreen, {
-    activeContentType: 'Line'
+Tine.Sipgate.MainScreen = function(config) {
+    Ext.apply(this, config);
+    
+    Tine.Sipgate.MainScreen.superclass.constructor.apply(this, arguments);
+};
+
+Ext.extend(Tine.Sipgate.MainScreen, Tine.widgets.MainScreen, {
+    activeContentType: 'Connection',
+    westPanelXType: 'tine.sipgate.linetreepanel',
+    
+    getCenterPanel: function() {
+        try {
+            if (!this.contentPanel) {
+                this.contentPanel = new Tine.Sipgate.ConnectionGridPanel({app: this.app});
+            }
+        } catch (e) {
+                Tine.log.err('Could not create centerPanel');
+                Tine.log.err(e);
+                this.contentPanel = new Ext.Panel({html: 'ERROR IN SIPGATE'});
+            }
+        return this.contentPanel;
+    },
+    
+    
+    /**
+     * Set toolbar panel in Tinebase.MainScreen
+     */
+    showNorthPanel: function() {
+        try {
+            if (! this.actionToolbar) {
+                this.actionToolbar = new Ext.Toolbar({
+                    items : [{
+                        xtype : 'buttongroup',
+                        columns : 1,
+                        items : [Ext.apply(
+                                new Ext.Button(new Ext.Action({
+                                        text : this.app.i18n._('Dial number'),
+                                        tooltip : this.app.i18n._('Initiates a new outgoing call'),
+                                        handler : function() { alert('HANDLE THIS!') },
+                                        iconCls : 'action_DialNumber',
+                                        scope : this
+                                    })), {
+                                    scale : 'medium',
+                                    rowspan : 2,
+                                    iconAlign : 'top'
+                                })]
+                    }, '->']
+                });
+            }
+        } catch (e) {
+            Tine.log.err('Could not create northPanel');
+            Tine.log.err(e);
+            this.actionToolbar = new Ext.Panel({html: 'ERROR'});
+        }
+        Tine.Tinebase.MainScreen.setActiveToolbar(this.actionToolbar, true);
+    }
+   
 });
     
-/**
- * @namespace   Tine.Projects
- * @class       Tine.Projects.TreePanel
- * @extends     Tine.widgets.container.TreePanel
- * 
- * @author      Alexander Stintzing <alex@stintzing.net>
- */
-Tine.Sipgate.TreePanel = Ext.extend(Tine.widgets.container.TreePanel, {
-    id: 'Sipgate_Tree',
-    filterMode: 'filterToolbar',
-    recordClass: Tine.Sipgate.Model.Line
-});
-
-/**
- * @class       Tine.Sipgate.FilterPanel
- * @extends     Tine.widgets.persistentfilter.PickerPanel
- *  
- * @param {Object} config
- */
-Tine.Sipgate.FilterPanel = function(config) {
-    Ext.apply(this, config);
-    Tine.Sipgate.FilterPanel.superclass.constructor.call(this);
-};
-Ext.extend(Tine.Sipgate.FilterPanel, Tine.widgets.persistentfilter.PickerPanel, {
-    filter: [{field: 'model', operator: 'equals', value: 'Sipgate_Model_LineFilter'}]
-});
-
+///**
+// * @namespace   Tine.Projects
+// * @class       Tine.Projects.TreePanel
+// * @extends     Tine.widgets.container.TreePanel
+// * 
+// * @author      Alexander Stintzing <alex@stintzing.net>
+// */
+//Tine.Sipgate.TreePanel = Ext.extend(Tine.widgets.container.TreePanel, {
+//    id: 'Sipgate_Tree',
+//    filterMode: 'filterToolbar',
+//    recordClass: Tine.Sipgate.Model.Line
+//});
 //
-//Tine.Sipgate.getPanel = function() {
-//
-//    var translation = new Locale.Gettext();
-//    translation.textdomain('Sipgate');
-//    var app = null;
-//    new Tine.Sipgate.AddressbookGridPanelHook({app : { i18n : translation }});
+///**
+// * @class       Tine.Sipgate.FilterPanel
+// * @extends     Tine.widgets.persistentfilter.PickerPanel
+// *  
+// * @param {Object} config
+// */
+//Tine.Sipgate.FilterPanel = function(config) {
 //    
-//// coming soon
-////    var editSipgateSettingsAction = new Ext.Action({
-////                text : translation._('Edit phone settings'),
-////                iconCls : 'SipgateIconCls',
-////                handler : function() {
-////                    // TODO: options by user
-////                },
-////                scope : this
-////            });
-////
-////    var contextMenu = new Ext.menu.Menu({
-////                items : [editSipgateSettingsAction]
-////            });
-//    /** ********* tree panel **************** */
-//
-//    var treePanel = new Ext.tree.TreePanel({
-//                title : translation.gettext('Sipgate'),
-//                id : 'sipgate-tree',
-//                iconCls : 'SipgateIconCls',
-//                rootVisible : true,
-//                border : false,
-//                collapsible : true
-//            });
-//
-//    /** ********* root node **************** */
-//
-//    var treeRoot = new Ext.tree.TreeNode({
-//                text : translation._('Devices'),
-//                cls : 'treemain',
-//                allowDrag : false,
-//                allowDrop : false,
-//                id : 'root',
-//                icon : false
-//            });
-//    treePanel.setRootNode(treeRoot);
-//
-//    Tine.Sipgate.loadSipgateStore();
-//
-//    /** ****** tree panel handlers ********** */
-//
-//    treePanel.on('click', function(node, event) {
-//                node.select();
-//            }, this);
-//// coming soon
-////    treePanel.on('contextmenu', function(node, event) {
-////                this.ctxNode = node;
-////                if (node.id != 'root') {
-////                    contextMenu.showAt(event.getXY());
-////                }
-////            }, this);
-//
-//    treePanel.on('beforeexpand', function(panel) {
-//                if (panel.getSelectionModel().getSelectedNode() === null) {
-//                    var node = panel.getRootNode();
-//                    node.select();
-//                    node.expand();
-//                } else {
-//                    panel.getSelectionModel().fireEvent('selectionchange',
-//                            panel.getSelectionModel());
-//                }
-//            }, this);
-//
-//    treePanel.getSelectionModel().on('selectionchange',
-//            function(_selectionModel) {
-//                var node = _selectionModel.getSelectedNode();
-//
-//                // update toolbar
-//                var settingsButton = Ext.getCmp('phone-settings-button');
-//                if (settingsButton) {
-//                    if (node && node.id != 'root') {
-//                        settingsButton.setDisabled(false);
-//                    } else {
-//                        settingsButton.setDisabled(true);
-//                    }
-//                }
-//                Tine.Sipgate.Main.show(node);
-//            }, this);
-//
-//    return treePanel;
+//    Ext.apply(this, config);
+//    Tine.Sipgate.FilterPanel.superclass.constructor.call(this);
 //};
+//
+//Ext.extend(Tine.Sipgate.FilterPanel, Tine.widgets.persistentfilter.PickerPanel, {
+//    filter: [{field: 'model', operator: 'equals', value: 'Sipgate_Model_ConnectionFilter'}]
+//});
+
 //
 ///** ************************** main *************************************** */
 ///**
@@ -562,171 +535,160 @@ Ext.extend(Tine.Sipgate.FilterPanel, Tine.widgets.persistentfilter.PickerPanel, 
  * @param string
  *            number
  */
-Tine.Sipgate.dialPhoneNumber = function(number, contact) {
+//Tine.Sipgate.dialPhoneNumber = function(number, contact) {
+//
+//    var translation = new Locale.Gettext();
+//    translation.textdomain('Sipgate');
+//
+//    if (!number) {
+//        var popUpWindow = Tine.Sipgate.DialNumberDialog.openWindow();
+//        return true;
+//    }
+//    
+//    if (!contact) {
+//        contact = { data : { n_fn : translation._('unknown Person')    }};
+//    }
+//
+//    var info = { name : contact.data.n_fn, number : number };
+//
+//    var win = Tine.Sipgate.CallStateWindow.openWindow({  info : info });
+//
+//    var initRequest = Ext.Ajax.request({
+//        url : 'index.php',
+//        params : { method : 'Sipgate.dialNumber', _number : number },
+//        success : function(_result, _request) {
+//            Tine.log.debug('RES: ',_result);
+//            var sessionId = Ext.decode(_result.responseText).state.SessionID;
+//            var win2 = Ext.getCmp('callstate-window');
+//            if(win2) {
+//                win2.sessionId = sessionId;
+//                Tine.Sipgate.CallStateWindow.startTask(sessionId, contact);
+//                Ext.getCmp('call-cancel-button').enable();
+//            }
+//        },
+//        failure : function(_result, _request) {
+//          Ext.Msg.alert(_('Configuration not set'), _('Please configure the Sipgate application'));
+//          win.close();
+//          
+//          return false;
+//          }
+//    });
+//    return true;
+//};
+//
+//Tine.Sipgate.addPhoneNumber = function(number) {
+//
+//    // check if addressbook app is available
+//    if (!Tine.Addressbook || !Tine.Tinebase.common.hasRight('run', 'Addressbook')) {
+//        return;
+//    }
+//    var popupWindow = Tine.Sipgate.SearchAddressDialog.openWindow({
+//        number : number
+//    });
+//};
+//
+//Tine.Sipgate.closeSession = function(sessionId) {
+//    Ext.Ajax.request({
+//        url : 'index.php',
+//
+//        params : {
+//            method : 'Sipgate.closeSession',
+//            sessionId : sessionId
+//            },
+//
+//        success : function(_result, _request) {    },
+//        failure : function(_result, _request) {    }
+//            });
+//};
+//
+///**
+// * @param string sessionId
+// * @param {Object} contact
+// */
+//
+//Tine.Sipgate.updateCallStateWindow = function(sessionId, contact) {
+//
+//    Ext.Ajax.request({
+//        url : 'index.php',
+//
+//        params : {
+//            method : 'Sipgate.getSessionStatus',
+//            sessionId : sessionId
+//        },
+//        success : function(_result, _request) {
+//            var result = Ext.decode(_result.responseText);
+//
+//            try {
+//                var uC = Ext.getCmp('csw-update-container');
+//                if (uC) throw uC;
+//                else throw false;
+//            } catch (e) {
+//                if (e != false) {
+//                    try {
+//                        if (result.StatusCode == 200) throw result;
+//                        else throw false;
+//                    } catch (e) {
+//                        if (e != false) {
+//                            // Statusmeldungen auswerten
+//                            switch (result.SessionStatus) {
+//                                case 'first dial' :
+//                                    Ext.getCmp('csw-call-info').update(Tine.Tinebase.appMgr.get('Sipgate').i18n._('first dial'));
+//                                    Ext.get('csw-my-phone').frame("ff0000", 1);
+//                                    CallingState = true;
+//                                    break;
+//                                case 'second dial' :
+//                                    Ext.getCmp('csw-call-info').update(Tine.Tinebase.appMgr.get('Sipgate').i18n._('second dial') + ' ' + contact.data.n_fn);
+//                                    Ext.get('csw-my-phone').addClass('established');
+//                                    Ext.get('csw-other-phone').frame("ff0000",1);
+//                                    CallingState = '1';
+//                                    break;
+//                                case 'established' :
+//                                    Ext.get('csw-other-phone').addClass('established');
+//                                    Ext.getCmp('csw-call-info').update(Tine.Tinebase.appMgr.get('Sipgate').i18n._('established') + ' ' + contact.data.n_fn);
+//                                    CallingState = '2';
+//                                    break;
+//                                case (('call 1 busy') || ('call 1 failed')):
+//                                    Ext.get('csw-my-phone').addClass('error');
+//                                    Ext.getCmp('csw-call-info').update(Tine.Tinebase.appMgr.get('Sipgate').i18n._('call 1 busy'));
+//                                    CallingState = false;
+//                                    Tine.Sipgate.CallStateWindow.stopTask();
+//                                    break;
+//                                case (('call 2 busy') || ('call 2 failed')) :
+//                                    Ext.get('csw-other-phone').addClass('error');
+//                                    Ext.get('csw-my-phone').removeClass('established');
+//                                    Ext.getCmp('csw-call-info').update(contact.data.n_fn + ' ' + Tine.Tinebase.appMgr.get('Sipgate').i18n._('call 2 busy'));
+//                                    CallingState = false;
+//                                    Tine.Sipgate.CallStateWindow.stopTask();
+//                                    break;
+//                                case 'hungup' :
+//                                    switch (CallingState) {
+//                                        case '1' :
+//                                            Ext.getCmp('csw-call-info').update(Tine.Tinebase.appMgr.get('Sipgate').i18n._('hungup before other called'));
+//                                            break;
+//                                        default :
+//                                            Ext.getCmp('csw-call-info').update(Tine.Tinebase.appMgr.get('Sipgate').i18n._('hungup'));
+//                                    }
+//                                    Ext.get('csw-my-phone').removeClass('established');
+//                                    Ext.get('csw-other-phone').removeClass('established');
+//                                    Tine.Sipgate.CallStateWindow.stopTask();
+//                                    CallingState = false;
+//                                    break;
+//                                default :
+//                                    Ext.getCmp('csw-call-info').update(result.SessionStatus);
+//                                    Tine.Sipgate.CallStateWindow.stopTask();
+//                                    CallingState = false;
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+//        },
+//        failure : function(result, request) {
+//
+//        }
+//    });
+//};    
 
-    var translation = new Locale.Gettext();
-    translation.textdomain('Sipgate');
 
-    if (!number) {
-        var popUpWindow = Tine.Sipgate.DialNumberDialog.openWindow();
-        return true;
-    }
-    
-    if (!contact) {
-        contact = { data : { n_fn : translation._('unknown Person')    }};
-    }
-
-    var info = { name : contact.data.n_fn, number : number };
-
-    var win = Tine.Sipgate.CallStateWindow.openWindow({  info : info });
-
-    var initRequest = Ext.Ajax.request({
-        url : 'index.php',
-        params : { method : 'Sipgate.dialNumber', _number : number },
-        success : function(_result, _request) {
-            Tine.log.debug('RES: ',_result);
-            var sessionId = Ext.decode(_result.responseText).state.SessionID;
-            var win2 = Ext.getCmp('callstate-window');
-            if(win2) {
-                win2.sessionId = sessionId;
-                Tine.Sipgate.CallStateWindow.startTask(sessionId, contact);
-                Ext.getCmp('call-cancel-button').enable();
-            }
-        },
-        failure : function(_result, _request) {
-          Ext.Msg.alert(_('Configuration not set'), _('Please configure the Sipgate application'));
-          win.close();
-          
-          return false;
-          }
-    });
-    return true;
-};
-
-Tine.Sipgate.addPhoneNumber = function(number) {
-
-    // check if addressbook app is available
-    if (!Tine.Addressbook || !Tine.Tinebase.common.hasRight('run', 'Addressbook')) {
-        return;
-    }
-    var popupWindow = Tine.Sipgate.SearchAddressDialog.openWindow({
-        number : number
-    });
-};
-
-Tine.Sipgate.closeSession = function(sessionId) {
-    Ext.Ajax.request({
-        url : 'index.php',
-
-        params : {
-            method : 'Sipgate.closeSession',
-            sessionId : sessionId
-            },
-
-        success : function(_result, _request) {    },
-        failure : function(_result, _request) {    }
-            });
-};
-
-/**
- * @param string sessionId
- * @param {Object} contact
- */
-
-Tine.Sipgate.updateCallStateWindow = function(sessionId, contact) {
-
-    Ext.Ajax.request({
-        url : 'index.php',
-
-        params : {
-            method : 'Sipgate.getSessionStatus',
-            sessionId : sessionId
-        },
-        success : function(_result, _request) {
-            var result = Ext.decode(_result.responseText);
-
-            try {
-                var uC = Ext.getCmp('csw-update-container');
-                if (uC) throw uC;
-                else throw false;
-            } catch (e) {
-                if (e != false) {
-                    try {
-                        if (result.StatusCode == 200) throw result;
-                        else throw false;
-                    } catch (e) {
-                        if (e != false) {
-                            // Statusmeldungen auswerten
-                            switch (result.SessionStatus) {
-                                case 'first dial' :
-                                    Ext.getCmp('csw-call-info').update(Tine.Tinebase.appMgr.get('Sipgate').i18n._('first dial'));
-                                    Ext.get('csw-my-phone').frame("ff0000", 1);
-                                    CallingState = true;
-                                    break;
-                                case 'second dial' :
-                                    Ext.getCmp('csw-call-info').update(Tine.Tinebase.appMgr.get('Sipgate').i18n._('second dial') + ' ' + contact.data.n_fn);
-                                    Ext.get('csw-my-phone').addClass('established');
-                                    Ext.get('csw-other-phone').frame("ff0000",1);
-                                    CallingState = '1';
-                                    break;
-                                case 'established' :
-                                    Ext.get('csw-other-phone').addClass('established');
-                                    Ext.getCmp('csw-call-info').update(Tine.Tinebase.appMgr.get('Sipgate').i18n._('established') + ' ' + contact.data.n_fn);
-                                    CallingState = '2';
-                                    break;
-                                case ('call 1 busy' || 'call 1 failed') :
-                                    Ext.get('csw-my-phone').addClass('error');
-                                    Ext.getCmp('csw-call-info').update(Tine.Tinebase.appMgr.get('Sipgate').i18n._('call 1 busy'));
-                                    CallingState = false;
-                                    Tine.Sipgate.CallStateWindow.stopTask();
-                                    break;
-                                case ('call 2 busy' || 'call 1 failed') :
-                                    Ext.get('csw-other-phone').addClass('error');
-                                    Ext.get('csw-my-phone').removeClass('established');
-                                    Ext.getCmp('csw-call-info').update(contact.data.n_fn + ' ' + Tine.Tinebase.appMgr.get('Sipgate').i18n._('call 2 busy'));
-                                    CallingState = false;
-                                    Tine.Sipgate.CallStateWindow.stopTask();
-                                    break;
-                                case 'hungup' :
-                                    switch (CallingState) {
-                                        case '1' :
-                                            Ext.getCmp('csw-call-info').update(Tine.Tinebase.appMgr.get('Sipgate').i18n._('hungup before other called'));
-                                            break;
-                                        default :
-                                            Ext.getCmp('csw-call-info').update(Tine.Tinebase.appMgr.get('Sipgate').i18n._('hungup'));
-                                    }
-                                    Ext.get('csw-my-phone').removeClass('established');
-                                    Ext.get('csw-other-phone').removeClass('established');
-                                    Tine.Sipgate.CallStateWindow.stopTask();
-                                    CallingState = false;
-                                    break;
-                                default :
-                                    Ext.getCmp('csw-call-info').update(result.SessionStatus);
-                                    Tine.Sipgate.CallStateWindow.stopTask();
-                                    CallingState = false;
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        failure : function(result, request) {
-
-        }
-    });
-};    
-
-/**
- * @namespace Tine.Sipgate
- * @class Tine.Sipgate.settingBackend
- * @extends Tine.Tinebase.data.RecordProxy
- * 
- * Settings Backend
- */ 
-Tine.Sipgate.settingsBackend = new Tine.Tinebase.data.RecordProxy({
-    appName: 'Sipgate',
-    modelName: 'Settings',
-    recordClass: Tine.Sipgate.Model.Settings
-});
 
 
