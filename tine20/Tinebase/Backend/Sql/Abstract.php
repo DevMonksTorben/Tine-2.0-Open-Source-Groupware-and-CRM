@@ -1243,60 +1243,46 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
     
     	if (empty($group)) return;
     
-    	$order = $select->getPart(Zend_Db_Select::ORDER);
-    
     	$columns = $select->getPart(Zend_Db_Select::COLUMNS);
     
-    	try {
-    
-    		//$column is an array where 0 is table, 1 is field and 2 is alias
-    		foreach($columns as $column)
-    		{
-    			$field = implode('.',$column);
-    			if (!in_array($field, $group))
-    			{
-    				// replaces * by each name of column
-    				if ($column[1] == '*')
-    				{
-    					$tableFields = $adapter->describeTable($tablePrefix . $column[0]);
-    					foreach($tableFields as $columnName => $schema)
-    					{
-    						// adds columns into group by clause (table.field)
-    						// checks if field has a function (that must be an aggregation)
-    						$element = "{$column[0]}.$columnName";
-    
-    						if (!in_array($element,$group) && !preg_match('/\(.*\)/',$element))
-    						{
-    							$group[] = $element;
-    						}
-    					}
-    				}
-    				else
-    				{
-    					// adds column into group by clause (table.field)
-    					$element = "{$column[0]}.{$column[1]}";
-    					if (!preg_match('/\(.*\)/',$element))
-    					{
-    						$group[] = $element;
-    					}
-    				}
-    			}
-    		}
-    
-    		// find fields in order by clause that are not into group by
-    		foreach($order as $column)
-    		{
-    			$field = $column[0];
-    			if (!in_array($field,$group))
-    			{
-    				// adds column into group by clause (table.field)
-    				$group[] = $field;
-    			}
-    		}
-    
-    		$select->reset(Zend_Db_Select::GROUP);
-    
-    		$select->group($group);
+    	try {    
+            //$column is an array where 0 is table, 1 is field and 2 is alias
+            foreach($columns as $column)
+            {
+                $field = implode('.',$column);
+                if (!in_array($field, $group))
+                {
+                    // replaces * by each name of column
+                    if ($column[1] == '*')
+                    {
+                        $tableFields = $adapter->describeTable($tablePrefix . $column[0]);
+                        foreach($tableFields as $columnName => $schema)
+                        {
+                            // adds columns into group by clause (table.field)
+                            // checks if field has a function (that must be an aggregation)
+                            $element = "{$column[0]}.$columnName";
+
+                            if (!in_array($element,$group) && !preg_match('/\(.*\)/',$element))
+                            {
+                                $group[] = $element;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        // adds column into group by clause (table.field)
+                        $element = "{$column[0]}.{$column[1]}";
+                        if (!preg_match('/\(.*\)/',$element))
+                        {
+                            $group[] = $element;
+                        }
+                    }
+                }
+            }
+
+            $select->reset(Zend_Db_Select::GROUP);
+
+            $select->group($group);
     	} catch (Exception $e) {
     		Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' Exception: ' . $e->getMessage() . ' Trace: ' . $e->getTraceAsString() );
     	}
