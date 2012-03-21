@@ -41,4 +41,32 @@ interface Tinebase_Backend_Sql_Command_Interface
       * @return string
       */
 	public static function getIfIsNull($adapter,$field,$returnIfTrue,$returnIfFalse);
+
+    /**
+     * 
+     * @param Zend_Db_Adapter_Abstract $adapter
+     * @param date $date      
+     */
+    public static function setDate($adapter, $date);	
+
+    /**
+     *
+     * @param Zend_Db_Adapter_Abstract $adapter
+     * @param date $date      
+     */
+    public static function setDateValue($adapter, $date);
+
+    
+    /**
+     * returns the false value according to backend
+     * @return mixed
+     */
+    public static function getFalseValue($adapter = null);
+    
+    /**
+     * returns the true value according to backend
+     * @return mixed
+     */
+    public static function getTrueValue($adapter = null);  
+ 
 }
