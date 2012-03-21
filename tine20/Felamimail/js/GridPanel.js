@@ -302,6 +302,15 @@ Tine.Felamimail.GridPanel = Ext.extend(Tine.widgets.grid.GridPanel, {
             scope: this
         });
         
+        this.action_exportMsg = new Ext.Action({
+            requiredGrant: 'readGrant',
+            allowMultiple: true,
+            text: this.app.i18n._('Save'),
+            handler: this.onExportMsgs,
+            iconCls: 'action_email_download',
+            scope: this
+        });  
+        
         this.action_addAccount = new Ext.Action({
             text: this.app.i18n._('Add Account'),
             handler: this.onAddAccount,
@@ -350,6 +359,7 @@ Tine.Felamimail.GridPanel = Ext.extend(Tine.widgets.grid.GridPanel, {
                 this.action_forward,
                 this.action_flag,
                 this.action_markUnread,
+                this.action_exportMsg,
                 this.action_deleteRecord
             ]
         });
@@ -563,40 +573,40 @@ Tine.Felamimail.GridPanel = Ext.extend(Tine.widgets.grid.GridPanel, {
         if (typeof(value) != 'undefined' ) {
 
             if (value == 1)
-            {
+        {
                 icons.push({
                     src: 'images/oxygen/16x16/mimetypes/application-pkcs7-signature.png',
                     qtip: _('Signed')
                 });
-            }
+        }
             if (value == 2)
-            {
+        {
                 icons.push({
                     src: 'images/oxygen/16x16/actions/encrypted.png',
                     qtip: _('Encrypted')
                 });
-            }
+        }
             if (value == 3)
-            {
+        {
                 icons.push({
                     src: 'images/oxygen/16x16/mimetypes/application-zip.png',
                     qtip: _('Compressed')
                 });
-            }
+        }
             if (value == 4)
-            {
+        {
                 icons.push({
                     src: 'images/oxygen/16x16/mimetypes/application-pkcs7-mime.png',
                     qtip: _('Certs Only')
                 });
-            }
+        }
             if (value == 5)
-            {
+        {
                 icons.push({
                     src: 'images/oxygen/16x16/mimetypes/application-pkcs7-mime.png',
                     qtip: _('pkcs7-mime')
                 });
-            }
+        }
 
         }
 
@@ -707,6 +717,38 @@ Tine.Felamimail.GridPanel = Ext.extend(Tine.widgets.grid.GridPanel, {
         } else {
             this.filterToolbar.onFilterChange();
         }
+    },
+    
+    /**
+     * Export messages handler
+     * 
+     * @return {void}
+     */
+    onExportMsgs: function() {
+        
+        var sm = this.getGrid().getSelectionModel()
+        if(sm.isFilterSelect){
+            var filter = sm.getSelectionFilter()
+            filter =  Ext.encode(filter)
+            msgsIds = ''
+         }else{
+            var msgs =  sm.getSelectionsCollection()
+            var msgsIds = []
+            msgs.each(function(msg) {
+                msgsIds.push(msg.id);
+            },  this);
+            filter=''
+
+        }
+            var downloader = new Ext.ux.file.Download({
+                params: {
+                    method: 'Felamimail.downloadMessage',
+                    requestType: 'HTTP',
+                    messageId: msgsIds,
+                    filter : filter
+
+                }
+            }).start()
     },
     
     /**
