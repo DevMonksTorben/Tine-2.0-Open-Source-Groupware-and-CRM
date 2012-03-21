@@ -263,6 +263,44 @@ Tine.Felamimail.setTreeContextMenus = function() {
         }
     };
     
+    
+    var manageAclsAction = {
+        text: this.app.i18n._('Share mailbox'),
+        iconCls: 'action_managePermissions',
+        scope: this,
+        handler:function() {
+                if (this.ctxNode) {
+                    var node = this.ctxNode;
+                    var folderId = this.ctxNode.attributes.globalname;
+                    var account = this.ctxNode.attributes.account_id;
+                    var window = Tine.Felamimail.AclsEditDialog.openWindow({
+                        title: String.format(_('Share mailbox')),
+                        accountId: account,
+                        // Using 'INBOX', can use folderId
+                        globalName: 'INBOX'
+                    });
+                }
+            }
+    };
+
+    var manageEmlImportAction = {
+        text: this.app.i18n._('Import msg(eml)'),
+        iconCls: 'action_import',
+        scope: this,
+        handler:function() {
+                if (this.ctxNode) {
+                    var window = Tine.Felamimail.ImportEmlDialog.openWindow({
+                        title: String.format(_(this.ctxNode.attributes.globalname)),
+                        account: this.ctxNode.attributes.account_id,
+                        textName: this.ctxNode.text,
+                        folderId: this.ctxNode.attributes.folder_id,
+                        // Using 'INBOX', can use folderId
+                        globalName: this.ctxNode.attributes.globalname
+                    });
+                }
+            }
+    };
+
     // mutual config options
     var config = {
         nodeName: this.app.i18n.n_('Folder', 'Folders', 1),
@@ -272,11 +310,11 @@ Tine.Felamimail.setTreeContextMenus = function() {
     };
     
     // system folder ctx menu
-    config.actions = [markFolderSeenAction, 'add'];
+    config.actions = [markFolderSeenAction, 'add', manageEmlImportAction];
     this.contextMenuSystemFolder = Tine.widgets.tree.ContextMenu.getMenu(config);
     
     // user folder ctx menu
-    config.actions = [markFolderSeenAction, 'add', 'rename', 'delete'];
+    config.actions = [markFolderSeenAction, 'add', 'rename', 'delete', manageEmlImportAction];
     this.contextMenuUserFolder = Tine.widgets.tree.ContextMenu.getMenu(config);
     
     // trash ctx menu
@@ -284,9 +322,14 @@ Tine.Felamimail.setTreeContextMenus = function() {
     this.contextMenuTrash = Tine.widgets.tree.ContextMenu.getMenu(config);
     
     // account ctx menu
+    if(Tine.Felamimail.registry.get('defaults').useSystemAccount == 1)
+        var actions = [addFolderToRootAction, updateFolderCacheAction, manageAclsAction, editVacationAction, editRulesAction, editAccountAction, 'delete'];
+    else
+        var actions = [addFolderToRootAction, updateFolderCacheAction, editVacationAction, editRulesAction, editAccountAction, 'delete'];
+    
     this.contextMenuAccount = Tine.widgets.tree.ContextMenu.getMenu({
         nodeName: this.app.i18n.n_('Account', 'Accounts', 1),
-        actions: [addFolderToRootAction, updateFolderCacheAction, editVacationAction, editRulesAction, editAccountAction, 'delete'],
+        actions: actions,
         scope: this,
         backend: 'Felamimail',
         backendModel: 'Account'

@@ -40,7 +40,14 @@ Tine.Felamimail.Model.Message = Tine.Tinebase.data.Record.create([
       { name: 'original_id' },
       { name: 'folder_id' },
       { name: 'note' },
+<<<<<<< HEAD
       { name: 'preparedParts' } // contains invitation event record
+=======
+      { name: 'preparedParts' }, // contains invitation event record
+      { name: 'reading_conf' },
+      { name: 'smime' },
+      { name: 'signature_info' }      
+>>>>>>> expresso3
     ], {
     appName: 'Felamimail',
     modelName: 'Message',
@@ -808,3 +815,10 @@ Tine.Felamimail.Model.Flag = Tine.Tinebase.data.Record.create(Tine.Tinebase.Mode
     containerName: 'Flag list',
     containersName: 'Flag lists'    
 });
+
+Tine.Felamimail.Model.Acl = Ext.data.Record.create([
+    {name: 'account_id'},
+    {name: 'account_name', sortType: Tine.Tinebase.common.accountSortType},
+    {name: 'readacl',    type: 'boolean'},
+    {name: 'writeacl',     type: 'boolean'}
+]);

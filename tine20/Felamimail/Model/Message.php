@@ -26,7 +26,12 @@
  * @property    array   $structure      the message structure
  * @property    array   $attachments    the attachments
  * @property    string  $messageuid     the message uid on the imap server
+<<<<<<< HEAD
  * @property    array   $preparedParts  prepared parts
+=======
+ * @property    integer $smime          true if is a digitaly signed message
+ * @property    integer $reading_conf   true if it must send a reading confirmation
+>>>>>>> expresso3
  */
 class Felamimail_Model_Message extends Tinebase_Record_Abstract
 {
@@ -68,6 +73,7 @@ class Felamimail_Model_Message extends Tinebase_Record_Abstract
      * attachment filename regexp 
      *
      */
+
     const ATTACHMENT_FILENAME_REGEXP = "/name=\"(.*)\"/";
     
     /**
@@ -137,6 +143,11 @@ class Felamimail_Model_Message extends Tinebase_Record_Abstract
         'message'               => array(Zend_Filter_Input::ALLOW_EMPTY => true),
     // prepared parts (iMIP invitations, contact vcards, ...)
         'preparedParts'         => array(Zend_Filter_Input::ALLOW_EMPTY => true),
+        'smime'                 => array(Zend_Filter_Input::ALLOW_EMPTY => true),
+        'reading_conf'          => array(Zend_Filter_Input::ALLOW_EMPTY => true,
+                                         Zend_Filter_Input::DEFAULT_VALUE => 0),
+        'signature_info'        => array(Zend_Filter_Input::ALLOW_EMPTY => true),
+
     );
     
     /**
@@ -159,6 +170,31 @@ class Felamimail_Model_Message extends Tinebase_Record_Abstract
     {
         return (is_array($this->flags) && in_array(Zend_Mail_Storage::FLAG_SEEN, $this->flags));
     }    
+
+    /**
+     * Send the reading confirmation in a message who has the correct header and is not seen yet
+     *
+     * @return void
+     */
+    public function sendReadingConfirmation()
+    {
+        if (($this->headers['disposition-notification-to']) && (!$this->hasSeenFlag()))
+        {
+            $translate = Tinebase_Translation::getTranslation($this->_application);
+            $from = Felamimail_Controller_Account::getInstance()->get($this->account_id);
+
+            $message = new Felamimail_Model_Message();
+            $message->account_id = $this->account_id;
+
+            $message->to         = $this->headers['disposition-notification-to'];
+            $message->subject    = $translate->_('Reading Confirmation:') . ' '. $this->subject;
+            $message->body       = $translate->_('Your message:'). ' ' . $this->subject . "\n" .
+                                   $translate->_('Received in')  . ' ' . $this->received . "\n" .
+                                   $translate->_('Was readed by:') . ' ' . $from->from .  ' <' . $from->email .'> ' .
+                                   $translate->_('in') . ' ' . (date('Y-m-d H:i:s'));
+            Felamimail_Controller_Message_Send::getInstance()->sendMessage($message);
+        }
+    }
     
     /**
      * parse headers and set 'date', 'from', 'to', 'cc', 'bcc', 'subject', 'sender' fields
@@ -407,6 +443,50 @@ class Felamimail_Model_Message extends Tinebase_Record_Abstract
         
         return $result;
     }
+
+    /**
+     * Parses SMIME types
+     *
+     * @param array $_structure
+     * @return void
+     */
+     public function parseSmime(array $_structure)
+     {
+         
+        switch ($_structure['contentType'])
+        {
+            case 'multipart/signed':
+                $this->smime = Expresso_Smime::TYPE_SIGNED_DATA_VALUE;
+                break;
+            case 'application/x-pkcs7-mime':
+            case 'application/pkcs7-mime':
+                if (is_array($_structure['parameters']) && !empty($_structure['parameters']['smime-type']))
+                {
+                    $smime_type = $_structure['parameters']['smime-type'];
+                    switch ($smime_type)
+                    {
+                        case 'signed-data':
+                            $this->smime = Expresso_Smime::TYPE_SIGNED_DATA_VALUE;
+                            break;
+                        case 'enveloped-data':
+                            $this->smime = Expresso_Smime::TYPE_ENVELOPED_DATA_VALUE;
+                            break;
+                        case 'compressed-data':
+                            $this->smime = Expresso_Smime::TYPE_COMPRESSED_DATA_VALUE;
+                            break;
+                        case 'certs-only':
+                            $this->smime = Expresso_Smime::TYPE_CERTS_ONLY_VALUE;
+                            break;
+                    }
+                }
+                else
+                    {
+                        $this->smime = 5;
+                    }
+                break;
+            default: $this->smime = 0;
+        }
+     }
     
     /**
      * parse structure to get text_partid and html_partid

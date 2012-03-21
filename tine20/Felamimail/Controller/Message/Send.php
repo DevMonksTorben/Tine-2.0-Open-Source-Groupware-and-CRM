@@ -417,7 +417,12 @@ class Felamimail_Controller_Message_Send extends Felamimail_Controller_Message
             if ($_message->flags && $_message->flags == Zend_Mail_Storage::FLAG_ANSWERED && $_message->original_id instanceof Felamimail_Model_Message) {
                 $_mail->addHeader('In-Reply-To', $_message->original_id->messageuid);
             }
-        
+
+            //set the header request response
+            if ($_message->reading_conf) {
+                $_mail->addHeader('Disposition-Notification-To', $_message->from_email);
+            }
+   
             // add other headers
             if (! empty($_message->headers) && is_array($_message->headers)) {
                 if (Tinebase_Core::isLogLevel(Zend_Log::DEBUG)) Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' Adding custom headers: ' . print_r($_message->headers, TRUE));

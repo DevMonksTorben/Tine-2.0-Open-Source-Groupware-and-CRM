@@ -59,8 +59,16 @@ class Felamimail_Controller_Message extends Tinebase_Controller_Record_Abstract
      * 
      * @var array
      */
-    protected $_purifyElements = array('images');
+    //protected $_purifyElements = array('images');
+    protected $_purifyElements = array();
     
+    /**
+     * attachments from the message
+     *
+     * @var array
+     */
+    protected $_attachments = array();
+
     /**
      * fallback charset constant
      * 
@@ -151,6 +159,45 @@ class Felamimail_Controller_Message extends Tinebase_Controller_Record_Abstract
         $imapBackend->appendMessage($message, $folder->globalname, $flags);
     }
     
+     /**
+     * import messages to folder from file(eml), or/and from a zip file.
+     *
+     * @param string $accountId
+     * @param string $globalName
+     * @param array $file
+     * @return array
+     */
+    public function importMessagefromfile($accountId,$folderId, $file)
+    {
+        $zip = zip_open($file);
+        if(gettype($zip) === 'resource')
+            {
+                // is a zip file ...
+                while ($zip_entry = zip_read($zip))
+                    {
+                        $filename = zip_entry_name($zip_entry);
+                        if (substr($filename, strlen($filename) - 4) == '.eml')
+                        {
+                            if (zip_entry_open($zip, $zip_entry, "r"))
+                            {
+                                $email = zip_entry_read($zip_entry, zip_entry_filesize($zip_entry));
+                                $result = Felamimail_Controller_Message::getInstance()->appendMessage($folderId, $email);
+                                zip_entry_close($zip_entry);
+                            }
+                        }
+                    }
+                zip_close($zip); 
+            }
+        else
+            {
+                // Error!!! Not zip file. But may be a eml file. Then try ...
+                $msg = file_get_contents($file);
+                $result = Felamimail_Controller_Message::getInstance()->appendMessage($folderId, $msg);
+            }
+        return array(
+            'status'    =>  'success' );
+    }
+    
     /**
      * get complete message by id
      *
@@ -201,8 +248,11 @@ class Felamimail_Controller_Message extends Tinebase_Controller_Record_Abstract
         : Zend_Mime::TYPE_TEXT;
         
         $headers     = $this->getMessageHeaders($_message, $_partId, true);
-        $body        = $this->getMessageBody($_message, $_partId, $mimeType, $_account, true);
         $attachments = $this->getAttachments($_message, $_partId);
+        $this->_attachments = $attachments;
+        $body        = $this->getMessageBody($_message, $_partId, $mimeType, $_account, true);
+        $signature   = $this->getDigitalSignature($_message, $_partId);
+
         
         if ($_partId === null) {
             $message = $_message;
@@ -210,6 +260,7 @@ class Felamimail_Controller_Message extends Tinebase_Controller_Record_Abstract
             $message->body        = $body;
             $message->headers     = $headers;
             $message->attachments = $attachments;
+            $message->signature_info   = $signature;
         } else {
             // create new object for rfc822 message
             $structure = $_message->getPartStructure($_partId, FALSE);
@@ -222,15 +273,19 @@ class Felamimail_Controller_Message extends Tinebase_Controller_Record_Abstract
                 'partid'      => $_partId,
                 'body'        => $body,
                 'headers'     => $headers,
-                'attachments' => $attachments
+                'attachments' => $attachments,
+            	'signature_info' => $signature,            		
             ));
         
             $message->parseHeaders($headers);
+            $message->parseSmime($message->structure);
         
             $structure = array_key_exists('messageStructure', $structure) ? $structure['messageStructure'] : $structure;
             $message->parseStructure($structure);
         }
         
+        $message->sendReadingConfirmation();
+
         return $message;
     }
     
@@ -399,6 +454,25 @@ class Felamimail_Controller_Message extends Tinebase_Controller_Record_Abstract
         
         return $part;
     }
+    
+    
+       /**
+     * get Raw message
+     *
+     * @param string|Felamimail_Model_Message $_id
+     * @return String
+     */
+    public function getRawMessage($_id)
+    {
+        $message = $this->get($_id);
+        
+        $partStructure  = $message->getPartStructure(NULL, FALSE);
+        
+        $rawContent = $this->_getPartContent($message, NULL, $partStructure, FALSE);
+        
+        return $rawContent;
+    }
+    
     
     /**
      * get part content (and update structure) from message part
@@ -880,13 +954,41 @@ class Felamimail_Controller_Message extends Tinebase_Controller_Record_Abstract
                     'filename'     => $filename,
                     'partId'       => $part['partId'],
                     'size'         => $part['size'],
-                    'description'  => $part['description']
+                    'description'  => $part['description'],
+		    		'cid'          => $part['id']
                 );
             }
         }
         
         return $attachments;
     }
+    
+    // Ignore $_partId
+    public function getDigitalSignature($messageId, $_partId = null)
+    {
+    
+    	$signature = false;
+    
+    	if (! $messageId instanceof Felamimail_Model_Message) {
+    		$message = $this->_backend->get($messageId);
+    	} else {
+    		$message = $messageId;
+    	}
+    
+    	if ($message->smime == Expresso_Smime::TYPE_SIGNED_DATA_VALUE)
+    	{
+    		$imapBackend = $this->_getBackendAndSelectFolder($message->folder_id);
+    
+    		$rawHeaders = $imapBackend->getRawContent($message->messageuid, 'HEADER');
+    		$rawBody = $imapBackend->getRawContent($message->messageuid);
+    		$rawMessage = $rawHeaders . $rawBody;
+    
+    		// do verification
+    		$signature = Expresso_Smime::verifyIntegrity($rawMessage, Tinebase_Core::getTempDir());
+    	}
+    
+    	return  $signature;
+    }    
     
     /**
      * delete messages from cache by folder

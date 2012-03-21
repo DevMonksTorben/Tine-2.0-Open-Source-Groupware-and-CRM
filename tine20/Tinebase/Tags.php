@@ -420,7 +420,9 @@ class Tinebase_Tags
         $tags = new Tinebase_Record_RecordSet('Tinebase_Model_Tag');
         if (!empty($recordId)) {
             $select = $this->_getSelect($recordId, Tinebase_Application::getInstance()->getApplicationByName($_record->getApplication())->getId());
+
             Tinebase_Model_TagRight::applyAclSql($select, $_right, $this->_db->quoteIdentifier('tagging.tag_id'));
+
             foreach ($this->_db->fetchAssoc($select) as $tagArray){
                 $tags->addRecord(new Tinebase_Model_Tag($tagArray, true));
             }
@@ -460,6 +462,7 @@ class Tinebase_Tags
 
         $select = $this->_getSelect($recordIds, $appId);
         $select->group(array('tagging.tag_id', 'tagging.record_id'));
+
         Tinebase_Model_TagRight::applyAclSql($select, $_right, $this->_db->quoteIdentifier('tagging.tag_id'));
         
         Tinebase_Backend_Sql_Abstract::traitGroup($this->_db, SQL_TABLE_PREFIX, $select);
@@ -736,6 +739,7 @@ class Tinebase_Tags
         );
 
         $this->_db->update(SQL_TABLE_PREFIX . 'tags', $data, $this->_db->quoteInto($this->_db->quoteIdentifier('id') . ' = ?', $tagId));
+
     }
 
     /**

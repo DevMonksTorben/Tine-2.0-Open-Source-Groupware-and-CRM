@@ -120,6 +120,22 @@ class Felamimail_Controller_Cache_Message extends Felamimail_Controller_Message
     }
     
     /**
+<<<<<<< HEAD
+=======
+    * get the message IDs from a filter
+    *
+    * @param string  $filter
+    * @return Tinebase_Record_RecordSet
+    */
+    public function getMessageIdsFromFilter($filter)
+    {
+        
+        return $this->_backend->getMessageIdsFromFilter($filter);
+        
+    }
+    
+    /**
+>>>>>>> expresso3
     * get folder status and return all folders where something needs to be done
     *
     * @param Felamimail_Model_FolderFilter  $_filter
@@ -856,6 +872,7 @@ class Felamimail_Controller_Cache_Message extends Felamimail_Controller_Message
         $message->parseStructure($_message['structure']);
         $message->parseHeaders($_message['header']);
         $message->parseBodyParts();
+        $message->parseSmime($_message['structure']);
         
         $attachments = $this->getAttachments($message);
         $message->has_attachment = (count($attachments) > 0) ? true : false;

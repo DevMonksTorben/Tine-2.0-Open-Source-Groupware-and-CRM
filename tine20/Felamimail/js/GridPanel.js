@@ -302,6 +302,15 @@ Tine.Felamimail.GridPanel = Ext.extend(Tine.widgets.grid.GridPanel, {
             scope: this
         });
         
+        this.action_exportMsg = new Ext.Action({
+            requiredGrant: 'readGrant',
+            allowMultiple: true,
+            text: this.app.i18n._('Save'),
+            handler: this.onExportMsgs,
+            iconCls: 'action_email_download',
+            scope: this
+        });  
+        
         this.action_addAccount = new Ext.Action({
             text: this.app.i18n._('Add Account'),
             handler: this.onAddAccount,
@@ -350,6 +359,7 @@ Tine.Felamimail.GridPanel = Ext.extend(Tine.widgets.grid.GridPanel, {
                 this.action_forward,
                 this.action_flag,
                 this.action_markUnread,
+                this.action_exportMsg,
                 this.action_deleteRecord
             ]
         });
@@ -464,6 +474,13 @@ Tine.Felamimail.GridPanel = Ext.extend(Tine.widgets.grid.GridPanel, {
             dataIndex: 'id',
             hidden: true
         }, {
+            id: 'smime',
+            header: this.app.i18n._("Security"),
+            width: 12,
+            sortable: true,
+            dataIndex: 'smime',
+            renderer: this.smimeRenderer
+        }, {
             id: 'content_type',
             header: this.app.i18n._("Attachments"),
             width: 12,
@@ -543,6 +560,63 @@ Tine.Felamimail.GridPanel = Ext.extend(Tine.widgets.grid.GridPanel, {
         }];
     },
     
+    /**
+     * Smime renderer
+     *
+     * @param {Integer} value
+     * @return {String}
+     * @private
+     */
+    smimeRenderer: function(value) {
+        var icons = [], result = '';
+
+        if (typeof(value) != 'undefined' ) {
+
+            if (value == 1)
+        {
+                icons.push({
+                    src: 'images/oxygen/16x16/mimetypes/application-pkcs7-signature.png',
+                    qtip: _('Signed')
+                });
+        }
+            if (value == 2)
+        {
+                icons.push({
+                    src: 'images/oxygen/16x16/actions/encrypted.png',
+                    qtip: _('Encrypted')
+                });
+        }
+            if (value == 3)
+        {
+                icons.push({
+                    src: 'images/oxygen/16x16/mimetypes/application-zip.png',
+                    qtip: _('Compressed')
+                });
+        }
+            if (value == 4)
+        {
+                icons.push({
+                    src: 'images/oxygen/16x16/mimetypes/application-pkcs7-mime.png',
+                    qtip: _('Certs Only')
+                });
+        }
+            if (value == 5)
+        {
+                icons.push({
+                    src: 'images/oxygen/16x16/mimetypes/application-pkcs7-mime.png',
+                    qtip: _('pkcs7-mime')
+                });
+        }
+
+        }
+
+        Ext.each(icons, function(icon) {
+            result += '<img class="FelamimailFlagIcon" src="' + icon.src + '" ext:qtip="' + icon.qtip + '">';
+        }, this);
+
+        return result;
+    },
+
     /**
      * attachment column renderer
      * 
@@ -646,17 +720,58 @@ Tine.Felamimail.GridPanel = Ext.extend(Tine.widgets.grid.GridPanel, {
     },
     
     /**
+     * Export messages handler
+     * 
+     * @return {void}
+     */
+    onExportMsgs: function() {
+        
+        var sm = this.getGrid().getSelectionModel()
+        if(sm.isFilterSelect){
+            var filter = sm.getSelectionFilter()
+            filter =  Ext.encode(filter)
+            msgsIds = ''
+         }else{
+            var msgs =  sm.getSelectionsCollection()
+            var msgsIds = []
+            msgs.each(function(msg) {
+                msgsIds.push(msg.id);
+            },  this);
+            filter=''
+
+        }
+            var downloader = new Ext.ux.file.Download({
+                params: {
+                    method: 'Felamimail.downloadMessage',
+                    requestType: 'HTTP',
+                    messageId: msgsIds,
+                    filter : filter
+
+                }
+            }).start()
+    },
+    
+    /**
      * delete messages handler
      * 
      * @return {void}
      */
     onDeleteRecords: function() {
         var account = this.app.getActiveAccount(),
-            trashId = (account) ? account.getTrashFolderId() : null,
-            trash = trashId ? this.app.getFolderStore().getById(trashId) : null,
-            trashConfigured = (account.get('trash_folder')); 
-            
-        return (trash && ! trash.isCurrentSelection()) || (! trash && trashConfigured) ? this.moveSelectedMessages(trash, true) : this.deleteSelectedMessages();
+        trashId = (account) ? account.getTrashFolderId() : null,
+        trash = trashId ? this.app.getFolderStore().getById(trashId) : null
+        trashConfigured = (account.get('trash_folder')); 
+        if(Tine.Felamimail.registry.get('preferences').get('confirmDelete') == '1')
+            {
+                Ext.MessageBox.confirm('', this.app.i18n._('Confirm Delete') + ' ?', function(btn) {
+                    if(btn == 'yes') { 
+                        return (Tine.Felamimail.registry.get('preferences').get('confirmUseTrash') == '1' && (trash && ! trash.isCurrentSelection()) || (! trash && trashConfigured)) ? this.moveSelectedMessages(trash, true) : this.deleteSelectedMessages();
+                }}, this);
+            }
+        else
+            {
+                return (Tine.Felamimail.registry.get('preferences').get('confirmUseTrash') == '1' && (trash && ! trash.isCurrentSelection()) || (! trash && trashConfigured)) ? this.moveSelectedMessages(trash, true) : this.deleteSelectedMessages();
+            }
     },
 
     /**

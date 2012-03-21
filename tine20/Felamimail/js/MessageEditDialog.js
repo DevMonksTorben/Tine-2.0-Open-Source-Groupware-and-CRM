@@ -174,6 +174,18 @@ Ext.namespace('Tine.Felamimail');
             tooltip: this.app.i18n._('Activate this toggle button to save the email text as a note attached to the recipient(s) contact(s).')
         });
 
+        this.action_toggleReadingConfirmation = new Ext.Action({
+            text: this.app.i18n._('Reading Confirmation'),
+            handler: this.onToggleReadingConfirmation,
+            iconCls: 'notes_noteIcon',
+            disabled: false,
+            scope: this,
+            enableToggle: true
+        });
+        this.button_toggleReadingConfirmation = Ext.apply(new Ext.Button(this.action_toggleReadingConfirmation), {
+            tooltip: this.app.i18n._('Activate this toggle button to receive a reading confirmation.')
+        });
+
         this.tbar = new Ext.Toolbar({
             defaults: {height: 55},
             items: [{
@@ -193,7 +205,8 @@ Ext.namespace('Tine.Felamimail');
                     }),
                     this.action_saveAsDraft,
                     this.button_saveEmailNote,
-                    this.action_saveAsTemplate
+                    this.action_saveAsTemplate,
+                    this.button_toggleReadingConfirmation,
                 ]
             }]
         });
@@ -638,6 +651,13 @@ Ext.namespace('Tine.Felamimail');
         this.record.set('note', (! this.record.get('note')));
     },
     
+    /**
+     * toggle Request Reading Confirmation
+     */
+    onToggleReadingConfirmation: function () {
+        this.record.set('reading_conf', (! this.record.get('reading_conf')));
+    },
+
     /**
      * search for contacts as recipients
      */

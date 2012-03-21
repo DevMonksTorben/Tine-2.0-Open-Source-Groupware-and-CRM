@@ -1380,6 +1380,7 @@ class Tinebase_Container extends Tinebase_Backend_Sql_Abstract
         $select = $this->_getSelect(array('id', 'content_seq'));
         $select->where($this->_db->quoteInto($this->_db->quoteIdentifier('id') . ' IN (?)', (array) $containerIds));
         $stmt = $this->_db->query($select);
+
         $result = $stmt->fetchAll();
         foreach ($result as $key => $value) {
             $result[$value['id']] = $value['content_seq'];

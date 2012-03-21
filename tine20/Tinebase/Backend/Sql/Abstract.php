@@ -433,7 +433,7 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
         $this->_addSecondarySort($_pagination);
         $_pagination->appendPaginationSql($select);
         
-        self::traitGroup($this->_db,$this->_tablePrefix, $select);
+        self::traitGroup($this->_db, $this->_tablePrefix, $select);
         
         if ($getIdValuePair) {
             return $this->_fetch($select, self::FETCH_MODE_PAIR);
@@ -498,7 +498,8 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
         if (Tinebase_Core::isLogLevel(Zend_Log::TRACE)) Tinebase_Core::getLogger()->trace(__METHOD__ . '::' . __LINE__ . ' ' . $countSelect);
         
         $this->_traitGroup($countSelect);
-        if (! empty($this->_additionalSearchCountCols)) {     	
+        
+        if (! empty($this->_additionalSearchCountCols)) {
             $result = $this->_db->fetchRow($countSelect);
         } else {
             $result = $this->_db->fetchOne($countSelect);
@@ -749,6 +750,7 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
     public function create(Tinebase_Record_Interface $_record) 
     {
         $identifier = $_record->getIdProperty();
+
         $primaryKey = $this->_getPrimaryKey($this->_tablePrefix . $this->_tableName);
         
         if (!$_record instanceof $this->_modelName) {
@@ -902,9 +904,9 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
                 
                 if (!empty($idsToRemove)) {
                     $where = '(' . 
-			$this->_db->quoteInto($this->_db->quoteIdentifier($this->_tablePrefix . $join['table'] . '.' . $join['joinOn']) . ' = ?', $_record->getId()) .
+                        $this->_db->quoteInto($this->_tablePrefix . $join['table'] . '.' . $join['joinOn'] . ' = ?', $_record->getId()) . 
                         ' AND ' . 
-			$this->_db->quoteInto($this->_db->quoteIdentifier($this->_tablePrefix . $join['table'] . '.' . $join['field']) . ' IN (?)', $idsToRemove) .
+                        $this->_db->quoteInto($this->_tablePrefix . $join['table'] . '.' . $join['field'] . ' IN (?)', $idsToRemove) .
                     ')';
                         
                     $this->_db->delete($this->_tablePrefix . $join['table'], $where);
@@ -1247,48 +1249,47 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
     
     	if (empty($group)) return;
     
-    	$order = $select->getPart(Zend_Db_Select::ORDER);
-    
     	$columns = $select->getPart(Zend_Db_Select::COLUMNS);
     
-    	try {
-    
-    		//$column is an array where 0 is table, 1 is field and 2 is alias
-    		foreach($columns as $column)
-    		{
-    			$field = implode('.',$column);
-    			if (!in_array($field, $group))
-    			{
-    				// replaces * by each name of column
-    				if ($column[1] == '*')
-    				{
-    					$tableFields = $adapter->describeTable($tablePrefix . $column[0]);
-    					foreach($tableFields as $columnName => $schema)
-    					{
-    						// adds columns into group by clause (table.field)
-    						// checks if field has a function (that must be an aggregation)
-    						$element = "{$column[0]}.$columnName";
-    
-    						if (!in_array($element,$group) && !preg_match('/\(.*\)/',$element))
-    						{
-    							$group[] = $element;
-    						}
-    					}
-    				}
-    				else
-    				{
-    					// adds column into group by clause (table.field)
-    					$element = "{$column[0]}.{$column[1]}";
-    					if (!preg_match('/\(.*\)/',$element))
-    					{
-    						$group[] = $element;
-    					}
-    				}
-    			}
-    		}    
-    		$select->reset(Zend_Db_Select::GROUP);
-    
-    		$select->group($group);
+    	try {    
+            //$column is an array where 0 is table, 1 is field and 2 is alias
+            foreach($columns as $column)
+            {
+                $field = implode('.',$column);
+                if (!in_array($field, $group))
+                {
+                    // replaces * by each name of column
+                    if ($column[1] == '*')
+                    {
+                        $tableFields = $adapter->describeTable($tablePrefix . $column[0]);
+                        foreach($tableFields as $columnName => $schema)
+                        {
+                            // adds columns into group by clause (table.field)
+                            // checks if field has a function (that must be an aggregation)
+                            $element = "{$column[0]}.$columnName";
+
+                            if (!in_array($element,$group) && !preg_match('/\(.*\)/',$element))
+                            {
+                                $group[] = $element;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        // adds column into group by clause (table.field)
+                        $element = "{$column[0]}.{$column[1]}";
+                        if (!preg_match('/\(.*\)/',$element))
+                        {
+                            $group[] = $element;
+                        }
+                    }
+                }
+            }
+
+            $select->reset(Zend_Db_Select::GROUP);
+
+            $select->group($group);
+
     	} catch (Exception $e) {
     		Tinebase_Core::getLogger()->debug(__METHOD__ . '::' . __LINE__ . ' Exception: ' . $e->getMessage() . ' Trace: ' . $e->getTraceAsString() );
     	}

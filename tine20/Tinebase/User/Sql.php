@@ -258,6 +258,7 @@ class Tinebase_User_Sql extends Tinebase_User_Abstract
          * THEN 'blocked' ELSE 'enabled' END) ELSE 'disabled' END
          */
         $statusSQL = 'CASE WHEN ' . $this->_db->quoteIdentifier($this->rowNameMapping['accountStatus']) . ' = ' . $this->_db->quote('enabled') . ' THEN (';
+
         $statusSQL .= 'CASE WHEN '.Tinebase_Backend_Sql_Command::setDate($this->_db, 'NOW()') .' > ' . $this->_db->quoteIdentifier($this->rowNameMapping['accountExpires']) . ' THEN ' . $this->_db->quote('expired') . 
         ' WHEN (' . $this->_db->quoteIdentifier($this->rowNameMapping['loginFailures']) . " > {$this->_maxLoginFailures} AND " . 
         Tinebase_Backend_Sql_Command::setDate($this->_db, $this->_db->quoteIdentifier($this->rowNameMapping['lastLoginFailure'])) . " + INTERVAL '{$this->_blockTime}' MINUTE > ". Tinebase_Backend_Sql_Command::setDate($this->_db, 'NOW()') .") THEN 'blocked'" . 
@@ -619,7 +620,7 @@ class Tinebase_User_Sql extends Tinebase_User_Abstract
      */
     public function addUser(Tinebase_Model_FullUser $_user)
     {
-        if($this instanceof Tinebase_User_Interface_SyncAble) {
+        if ($this instanceof Tinebase_User_Interface_SyncAble) {
             $userFromSyncBackend = $this->addUserToSyncBackend($_user);
             // set accountId for sql backend sql backend
             $_user->setId($userFromSyncBackend->getId());

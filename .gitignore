@@ -13,5 +13,9 @@ tine20/Tinebase/js/Locale/build/*.js
 scripts/packaging/tine20build/
 tine20/build
 scripts/weeklyevents
+<<<<<<< HEAD
 scripts/custom
 scripts/syncuuids/conf.php
+=======
+/tine20/.idea/
+>>>>>>> expresso3

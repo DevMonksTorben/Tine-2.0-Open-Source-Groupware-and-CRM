@@ -238,6 +238,7 @@ Ext.ns('Tine.Felamimail');
                     '{[this.showRecipients(values.headers)]}',
                     '{[this.showHeaders("' + this.i18n._('Show or hide header information') + '")]}',
                 '</div>',
+                '<div class="preview-panel-felamimail-signature">{[this.showSignatureInfo(values.signature_info, values)]}</div>',
                 '<div class="preview-panel-felamimail-attachments">{[this.showAttachments(values.attachments, values)]}</div>',
                 '<div class="preview-panel-felamimail-body">{[this.showBody(values.body, values)]}</div>',
             '</div>',{
@@ -335,6 +336,24 @@ Ext.ns('Tine.Felamimail');
                         + ' (' + Ext.util.Format.fileSize(attachments[i].size) + ')</span> ';
                 }
                 
+                return result;
+            },
+
+            showSignatureInfo: function(signature_info, messageData) {
+                var result = signature_info ? '<b>' + this.app.i18n._('Digitally Signed Message') + ':</b> ' : '';
+
+                if (signature_info)
+                {
+                    if (signature_info.success)
+                    {
+                        result += Ext.util.Format.htmlEncode(this.app.i18n._('Message Integrity Ok'));
+                    }
+                    else
+                        {
+                            result += Ext.util.Format.htmlEncode(this.app.i18n._('Message Integrity not Ok'));
+                        }
+                }
+
                 return result;
             }
         });

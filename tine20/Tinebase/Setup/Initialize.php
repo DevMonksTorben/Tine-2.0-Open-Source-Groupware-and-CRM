@@ -25,7 +25,8 @@ class Tinebase_Setup_Initialize extends Setup_Initialize
      */
     public function _initialize(Tinebase_Model_Application $_application, $_options = null)
     {
-	$this->_initProcedures();
+
+	    $this->_initProcedures();
 	
         $this->_setupConfigOptions($_options);
         $this->_setupGroups();
@@ -120,9 +121,7 @@ class Tinebase_Setup_Initialize extends Setup_Initialize
 				RETURN VARCHAR2
 				PARALLEL_ENABLE AGGREGATE USING t_string_agg;";
 			$backend->execQueryVoid($group_concat);			
-		}
-		
-		
+		}		
     }
 
     /**
