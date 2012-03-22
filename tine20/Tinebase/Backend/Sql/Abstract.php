@@ -1248,9 +1248,11 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
     	$group = $select->getPart(Zend_Db_Select::GROUP);
     
     	if (empty($group)) return;
+    	
+    	$order = $select->getPart(Zend_Db_Select::ORDER);    	
     
-    	$columns = $select->getPart(Zend_Db_Select::COLUMNS);
-    
+    	$columns = $select->getPart(Zend_Db_Select::COLUMNS); 	
+    	    
     	try {    
             //$column is an array where 0 is table, 1 is field and 2 is alias
             foreach($columns as $column)
@@ -1285,6 +1287,16 @@ abstract class Tinebase_Backend_Sql_Abstract extends Tinebase_Backend_Abstract i
                     }
                 }
             }
+            
+            foreach($order as $column)
+            {
+            	$field = $column[0];
+            	if (preg_match('/.*\..*/',$field) && !in_array($field,$group))
+            	{
+            		// adds column into group by clause (table.field)
+            		$group[] = $field;
+            	}
+            }            
 
             $select->reset(Zend_Db_Select::GROUP);
 
