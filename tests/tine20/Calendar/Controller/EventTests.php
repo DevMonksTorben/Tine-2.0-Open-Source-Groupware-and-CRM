@@ -908,7 +908,7 @@ class Calendar_Controller_EventTests extends Calendar_TestCase
     /**
      * testSetAlarmOfRecurSeries
      */
-    public function testSetAlarmOfRecurSeries()
+    public function _testSetAlarmOfRecurSeries()
     {
         $event = $this->_getEvent();
         $event->rrule = 'FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR;INTERVAL=1';
